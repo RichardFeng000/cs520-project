@@ -695,8 +695,8 @@ def main() -> None:
     parser.add_argument("--level", type=int, default=1)
     parser.add_argument("--eval-episodes", type=int, default=60)
     parser.add_argument("--death-policy", choices=("model1", "model2", "model3"), default="model2")
-    parser.add_argument("--output", default="training/rl_q_table.json")
-    parser.add_argument("--js-output", default="training/rl_model.generated.js")
+    parser.add_argument("--output", default="RL/rl_q_table.json")
+    parser.add_argument("--js-output", default="RL/rl_model.generated.js")
     args = parser.parse_args()
 
     learner, stats = train(

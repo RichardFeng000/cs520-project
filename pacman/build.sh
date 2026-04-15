@@ -7,9 +7,9 @@
 OUTPUT="pacman.js"
 PUBLIC_DIR="./public"
 debug_includes="\n"
-MODEL_LIBRARY_DIR="../training/models"
+MODEL_LIBRARY_DIR="../RL/models"
 MODEL3_RL_MODEL="$MODEL_LIBRARY_DIR/rl_model3.generated.js"
-EXTERNAL_RL_MODEL="../training/rl_model.generated.js"
+EXTERNAL_RL_MODEL="../RL/rl_model.generated.js"
 
 # write header
 echo "
