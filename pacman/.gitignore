@@ -1,0 +1,5 @@
+*~
+*.pyc
+.idea
+.next
+node_modules

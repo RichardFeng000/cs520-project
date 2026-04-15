@@ -1,0 +1,7 @@
+.DS_Store
+*.pyc
+
+training/__pycache__/
+pacman/.idea/
+pacman/.next/
+pacman/node_modules/
