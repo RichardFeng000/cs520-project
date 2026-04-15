@@ -8,7 +8,7 @@ OUTPUT="pacman.js"
 PUBLIC_DIR="./public"
 debug_includes="\n"
 MODEL_LIBRARY_DIR="../training/models"
-MODEL3_RL_MODEL="$MODEL_LIBRARY_DIR/model3.generated.js"
+MODEL3_RL_MODEL="$MODEL_LIBRARY_DIR/rl_model3.generated.js"
 EXTERNAL_RL_MODEL="../training/rl_model.generated.js"
 
 # write header
@@ -39,7 +39,7 @@ echo "
 
 echo "window.__PACMAN_MODEL_LIBRARY__ = window.__PACMAN_MODEL_LIBRARY__ || {};" >> $OUTPUT
 
-for model_file in "$MODEL_LIBRARY_DIR"/model*.generated.js
+for model_file in "$MODEL_LIBRARY_DIR"/rl_model[0-9]*.generated.js
 do
     if [ ! -f "$model_file" ]; then
         continue
