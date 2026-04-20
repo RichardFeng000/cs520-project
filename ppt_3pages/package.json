@@ -1,0 +1,12 @@
+{
+  "name": "ppt-3pages",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Three-slide presentation for the RL project",
+  "scripts": {
+    "build": "node build_ppt.js"
+  },
+  "dependencies": {
+    "pptxgenjs": "^3.12.0"
+  }
+}
