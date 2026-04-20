@@ -114,6 +114,7 @@ function addPanel(slide, opts = {}) {
     rectRadius: 0.08,
     line: { color: lineColor, pt: linePt },
     fill: {
+      type: "solid",
       color: opts.fillColor ?? COLORS.white,
       transparency: opts.fillTransparency ?? 0,
     },
@@ -201,6 +202,7 @@ function addInlineMetricCard(slide, label, value, opts = {}) {
     w: opts.w,
     h: opts.h,
     fillColor: opts.fillColor,
+    fillTransparency: opts.fillTransparency,
     lineColor: opts.lineColor,
     linePt: 1.4,
   });
@@ -229,6 +231,7 @@ function addLivesCard(slide, opts = {}) {
     w: opts.w,
     h: opts.h,
     fillColor: opts.fillColor,
+    fillTransparency: opts.fillTransparency,
     lineColor: opts.lineColor,
     linePt: 1.4,
   });
@@ -281,6 +284,7 @@ function addPelletCard(slide, opts = {}) {
     w: opts.w,
     h: opts.h,
     fillColor: opts.fillColor,
+    fillTransparency: opts.fillTransparency,
     lineColor: opts.lineColor,
     linePt: 1.4,
   });
@@ -333,6 +337,7 @@ function addEnergizerCard(slide, opts = {}) {
     w: opts.w,
     h: opts.h,
     fillColor: opts.fillColor,
+    fillTransparency: opts.fillTransparency,
     lineColor: opts.lineColor,
     linePt: 1.4,
   });
@@ -379,6 +384,7 @@ function addGhostComboCard(slide, opts = {}) {
     w: opts.w,
     h: opts.h,
     fillColor: opts.fillColor,
+    fillTransparency: opts.fillTransparency,
     lineColor: opts.lineColor,
     linePt: 1.4,
   });
@@ -424,6 +430,7 @@ function addFruitCard(slide, opts = {}) {
     w: opts.w,
     h: opts.h,
     fillColor: opts.fillColor,
+    fillTransparency: opts.fillTransparency,
     lineColor: opts.lineColor,
     linePt: 1.4,
   });
@@ -469,6 +476,7 @@ function addSectionCard(slide, title, items, opts = {}) {
     w: opts.w,
     h: opts.h,
     fillColor: opts.fillColor ?? COLORS.white,
+    fillTransparency: opts.fillTransparency,
     lineColor: opts.lineColor ?? COLORS.line,
     linePt: 1.3,
   });
@@ -517,6 +525,7 @@ function addSummaryBand(slide, text, opts = {}) {
     w: opts.w,
     h: opts.h,
     fillColor: opts.fillColor ?? COLORS.light,
+    fillTransparency: opts.fillTransparency,
     lineColor: opts.lineColor ?? COLORS.line,
     linePt: 1.1,
   });
@@ -563,50 +572,50 @@ function addSlide1() {
     y: 2.0,
     w: 1.95,
     h: 1.02,
-    fillColor: COLORS.glass,
+    fillColor: "1A2030",
     lineColor: COLORS.red,
     valueColor: COLORS.darkRed,
-    fillTransparency: 100,
+    fillTransparency: 20,
   });
   addPelletCard(slide, {
     x: 2.85,
     y: 2.0,
     w: 1.95,
     h: 1.02,
-    fillColor: COLORS.glass,
+    fillColor: "1A2030",
     lineColor: COLORS.blue,
     valueColor: COLORS.darkBlue,
-    fillTransparency: 100,
+    fillTransparency: 20,
   });
   addEnergizerCard(slide, {
     x: 5.0,
     y: 2.0,
     w: 2.15,
     h: 1.02,
-    fillColor: COLORS.glass,
+    fillColor: "1A2030",
     lineColor: COLORS.teal,
     valueColor: COLORS.darkTeal,
-    fillTransparency: 100,
+    fillTransparency: 20,
   });
   addGhostComboCard(slide, {
     x: 7.35,
     y: 2.0,
     w: 2.65,
     h: 1.02,
-    fillColor: COLORS.glass,
+    fillColor: "1A2030",
     lineColor: COLORS.gold,
     valueColor: "A66A00",
-    fillTransparency: 100,
+    fillTransparency: 20,
   });
   addFruitCard(slide, {
     x: 10.2,
     y: 2.0,
     w: 2.45,
     h: 1.02,
-    fillColor: COLORS.glass,
+    fillColor: "1A2030",
     lineColor: COLORS.line,
     valueColor: COLORS.ink,
-    fillTransparency: 100,
+    fillTransparency: 20,
   });
 
   addSectionCard(
@@ -623,12 +632,12 @@ function addSlide1() {
       y: 3.22,
       w: 5.95,
       h: 3.1,
-      fillColor: COLORS.glass,
+      fillColor: "1A2030",
       lineColor: COLORS.blue,
       titleColor: COLORS.darkBlue,
       fontSize: 16,
       paraSpaceAfterPt: 9,
-      fillTransparency: 100,
+      fillTransparency: 20,
     }
   );
 
@@ -646,12 +655,12 @@ function addSlide1() {
       y: 3.22,
       w: 5.77,
       h: 3.1,
-      fillColor: COLORS.glass,
+      fillColor: "1A2030",
       lineColor: COLORS.teal,
       titleColor: COLORS.darkTeal,
       fontSize: 15,
       paraSpaceAfterPt: 8,
-      fillTransparency: 100,
+      fillTransparency: 20,
     }
   );
 
@@ -660,10 +669,10 @@ function addSlide1() {
     y: 6.5,
     w: 11.95,
     h: 0.46,
-    fillColor: COLORS.glass,
+    fillColor: "1A2030",
     lineColor: COLORS.line,
     fontSize: 14,
-    fillTransparency: 100,
+    fillTransparency: 20,
   });
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -705,10 +714,10 @@ function addSlide2() {
     y: 2.45,
     w: 1.9,
     h: 0.72,
-    fillColor: COLORS.glass,
+    fillColor: "1A2030",
     lineColor: COLORS.blue,
     valueColor: COLORS.white,
-    fillTransparency: 100,
+    fillTransparency: 20,
     fontSize: 9.5,
   });
   addInlineMetricCard(slide, "FRUIT/GHOST", "Bns/+200~1600", {
@@ -716,10 +725,10 @@ function addSlide2() {
     y: 2.45,
     w: 1.9,
     h: 0.72,
-    fillColor: COLORS.glass,
+    fillColor: "1A2030",
     lineColor: COLORS.gold,
     valueColor: COLORS.white,
-    fillTransparency: 100,
+    fillTransparency: 20,
     fontSize: 8.6,
   });
   addInlineMetricCard(slide, "ESCAPE/CHASE", "+1.5/+3", {
@@ -727,10 +736,10 @@ function addSlide2() {
     y: 2.45,
     w: 1.9,
     h: 0.72,
-    fillColor: COLORS.glass,
+    fillColor: "1A2030",
     lineColor: COLORS.teal,
     valueColor: COLORS.white,
-    fillTransparency: 100,
+    fillTransparency: 20,
     fontSize: 8.8,
   });
   addInlineMetricCard(slide, "FRUIT/CLEAR", "+2/+500", {
@@ -738,10 +747,10 @@ function addSlide2() {
     y: 2.45,
     w: 1.9,
     h: 0.72,
-    fillColor: COLORS.glass,
+    fillColor: "1A2030",
     lineColor: COLORS.teal,
     valueColor: COLORS.white,
-    fillTransparency: 100,
+    fillTransparency: 20,
     fontSize: 9.2,
   });
   addInlineMetricCard(slide, "STEP/PRESS.", "-1/-0.5×P", {
@@ -749,10 +758,10 @@ function addSlide2() {
     y: 2.45,
     w: 1.9,
     h: 0.72,
-    fillColor: COLORS.glass,
+    fillColor: "1A2030",
     lineColor: COLORS.red,
     valueColor: COLORS.white,
-    fillTransparency: 100,
+    fillTransparency: 20,
     fontSize: 8.8,
   });
   addInlineMetricCard(slide, "TIMEOUT/DEATH", "-250/Large-", {
@@ -760,10 +769,10 @@ function addSlide2() {
     y: 2.45,
     w: 1.9,
     h: 0.72,
-    fillColor: COLORS.glass,
+    fillColor: "1A2030",
     lineColor: COLORS.red,
     valueColor: COLORS.white,
-    fillTransparency: 100,
+    fillTransparency: 20,
     fontSize: 8.4,
   });
 
@@ -781,12 +790,12 @@ function addSlide2() {
       y: 3.45,
       w: 3.78,
       h: 2.48,
-      fillColor: COLORS.glass,
+      fillColor: "1A2030",
       lineColor: COLORS.blue,
       titleColor: COLORS.darkTeal,
       fontSize: 12.5,
       paraSpaceAfterPt: 5,
-      fillTransparency: 100,
+      fillTransparency: 20,
     }
   );
 
@@ -804,12 +813,12 @@ function addSlide2() {
       y: 3.45,
       w: 3.78,
       h: 2.48,
-      fillColor: COLORS.glass,
+      fillColor: "1A2030",
       lineColor: COLORS.teal,
       titleColor: COLORS.darkRed,
       fontSize: 12.5,
       paraSpaceAfterPt: 5,
-      fillTransparency: 100,
+      fillTransparency: 20,
     }
   );
 
@@ -827,12 +836,12 @@ function addSlide2() {
       y: 3.45,
       w: 3.78,
       h: 2.48,
-      fillColor: COLORS.glass,
+      fillColor: "1A2030",
       lineColor: COLORS.red,
       titleColor: COLORS.darkRed,
       fontSize: 12.5,
       paraSpaceAfterPt: 5,
-      fillTransparency: 100,
+      fillTransparency: 20,
     }
   );
 
