@@ -169,26 +169,56 @@ function addMetricCard(slide, title, value, opts = {}) {
 
   slide.addText(title, {
     x: opts.x + 0.2,
-    y: opts.y + 0.18,
-    w: opts.w - 0.4,
-    h: 0.22,
+    y: opts.titleY ?? (opts.y + 0.18),
+    w: opts.titleW ?? (opts.w - 0.4),
+    h: opts.titleH ?? 0.22,
     fontFace: "Arial",
-    fontSize: 10,
+    fontSize: opts.titleFontSize ?? 10,
     bold: true,
     color: COLORS.textSoft,
     margin: 0,
+    align: opts.titleAlign ?? "left",
   });
 
   slide.addText(value, {
-    x: opts.x + 0.2,
-    y: opts.y + 0.45,
-    w: opts.w - 0.4,
-    h: 0.38,
+    x: opts.valueX ?? (opts.x + 0.2),
+    y: opts.valueY ?? (opts.y + 0.45),
+    w: opts.valueW ?? (opts.w - 0.4),
+    h: opts.valueH ?? 0.38,
     fontFace: "Arial",
-    fontSize: 22,
+    fontSize: opts.valueFontSize ?? 22,
     bold: true,
     color: opts.valueColor ?? COLORS.ink,
     margin: 0,
+    align: opts.valueAlign ?? "left",
+  });
+}
+
+function addInlineMetricCard(slide, label, value, opts = {}) {
+  addPanel(slide, {
+    x: opts.x,
+    y: opts.y,
+    w: opts.w,
+    h: opts.h,
+    fillColor: opts.fillColor,
+    lineColor: opts.lineColor,
+    linePt: 1.4,
+  });
+
+  slide.addText([
+    { text: `${label}  `, options: { bold: true, color: COLORS.textSoft } },
+    { text: value, options: { bold: true, color: opts.valueColor ?? COLORS.white } },
+  ], {
+    x: opts.x + 0.22,
+    y: opts.y + 0.29,
+    w: opts.w - 0.44,
+    h: 0.22,
+    fontFace: "Arial",
+    fontSize: opts.fontSize ?? 15,
+    margin: 0,
+    align: "center",
+    valign: "mid",
+    breakLine: false,
   });
 }
 
@@ -646,63 +676,139 @@ function addSlide2() {
   addPacmanBackground(slide);
   addHeader(slide, "Slide 2", "Reward and Penalty Design", COLORS.teal);
 
-  addTag(slide, "Efficiency", {
+  slide.addText("Markov Decision Process (MDP)", {
     x: 0.7,
-    y: 1.98,
-    w: 1.45,
-    h: 0.46,
-    fillColor: COLORS.softBlue,
+    y: 1.58,
+    w: 3.7,
+    h: 0.22,
+    fontFace: "Arial",
+    fontSize: 11,
+    bold: true,
+    color: COLORS.textSoft,
+    margin: 0,
+  });
+
+  slide.addText("Q(s,a) ← Q(s,a) + α[r + γ max_a' Q(s',a') − Q(s,a)]", {
+    x: 0.7,
+    y: 1.82,
+    w: 11.95,
+    h: 0.34,
+    fontFace: "Arial",
+    fontSize: 17,
+    bold: true,
+    color: COLORS.white,
+    margin: 0,
+  });
+
+  addInlineMetricCard(slide, "PELLET/E.", "+10/+50", {
+    x: 0.7,
+    y: 2.45,
+    w: 1.9,
+    h: 0.72,
+    fillColor: COLORS.glass,
     lineColor: COLORS.blue,
-    textColor: COLORS.darkBlue,
+    valueColor: COLORS.white,
+    fillTransparency: 100,
+    fontSize: 9.5,
   });
-  addTag(slide, "Survival", {
-    x: 2.3,
-    y: 1.98,
-    w: 1.45,
-    h: 0.46,
-    fillColor: COLORS.softRed,
-    lineColor: COLORS.red,
-    textColor: COLORS.darkRed,
-  });
-  addTag(slide, "Opportunity", {
-    x: 3.9,
-    y: 1.98,
-    w: 1.65,
-    h: 0.46,
-    fillColor: COLORS.softGold,
+  addInlineMetricCard(slide, "FRUIT/GHOST", "Bns/+200~1600", {
+    x: 2.71,
+    y: 2.45,
+    w: 1.9,
+    h: 0.72,
+    fillColor: COLORS.glass,
     lineColor: COLORS.gold,
-    textColor: "A66A00",
+    valueColor: COLORS.white,
+    fillTransparency: 100,
+    fontSize: 8.6,
   });
-  addTag(slide, "Long-term Return", {
-    x: 5.7,
-    y: 1.98,
-    w: 2.15,
-    h: 0.46,
-    fillColor: COLORS.softTeal,
+  addInlineMetricCard(slide, "ESCAPE/CHASE", "+1.5/+3", {
+    x: 4.72,
+    y: 2.45,
+    w: 1.9,
+    h: 0.72,
+    fillColor: COLORS.glass,
     lineColor: COLORS.teal,
-    textColor: COLORS.darkTeal,
+    valueColor: COLORS.white,
+    fillTransparency: 100,
+    fontSize: 8.8,
+  });
+  addInlineMetricCard(slide, "FRUIT/CLEAR", "+2/+500", {
+    x: 6.73,
+    y: 2.45,
+    w: 1.9,
+    h: 0.72,
+    fillColor: COLORS.glass,
+    lineColor: COLORS.teal,
+    valueColor: COLORS.white,
+    fillTransparency: 100,
+    fontSize: 9.2,
+  });
+  addInlineMetricCard(slide, "STEP/PRESS.", "-1/-0.5×P", {
+    x: 8.74,
+    y: 2.45,
+    w: 1.9,
+    h: 0.72,
+    fillColor: COLORS.glass,
+    lineColor: COLORS.red,
+    valueColor: COLORS.white,
+    fillTransparency: 100,
+    fontSize: 8.8,
+  });
+  addInlineMetricCard(slide, "TIMEOUT/DEATH", "-250/Large-", {
+    x: 10.75,
+    y: 2.45,
+    w: 1.9,
+    h: 0.72,
+    fillColor: COLORS.glass,
+    lineColor: COLORS.red,
+    valueColor: COLORS.white,
+    fillTransparency: 100,
+    fontSize: 8.4,
   });
 
   addSectionCard(
     slide,
-    "Rewards",
+    "Score Rewards",
     [
-      "Positive rewards are given for collecting pellets, energizers, fruit, and vulnerable ghosts.",
-      "Moving away from nearby dangerous ghosts gives an extra reward.",
-      "Moving closer to vulnerable ghosts gives an extra reward.",
-      "Moving closer to fruit also gives an extra reward.",
-      "Clearing the level gives a large terminal reward of +500."
+      "Pellet: +10",
+      "Energizer: +50",
+      "Fruit collection: fruit bonus",
+      "Vulnerable ghost combo: +200 / +400 / +800 / +1600"
     ],
     {
-    x: 0.7,
-    y: 2.72,
-    w: 5.98,
-    h: 3.82,
+      x: 0.7,
+      y: 3.45,
+      w: 3.78,
+      h: 2.48,
+      fillColor: COLORS.glass,
+      lineColor: COLORS.blue,
+      titleColor: COLORS.darkTeal,
+      fontSize: 12.5,
+      paraSpaceAfterPt: 5,
+      fillTransparency: 100,
+    }
+  );
+
+  addSectionCard(
+    slide,
+    "Shaping Rewards",
+    [
+      "Escape a nearby dangerous ghost: +1.5",
+      "Move closer to a vulnerable ghost: +3",
+      "Move closer to fruit: +2",
+      "Clear the level: +500"
+    ],
+    {
+      x: 4.78,
+      y: 3.45,
+      w: 3.78,
+      h: 2.48,
       fillColor: COLORS.glass,
       lineColor: COLORS.teal,
-      titleColor: COLORS.darkTeal,
-      fontSize: 15,
-      paraSpaceAfterPt: 8,
+      titleColor: COLORS.darkRed,
+      fontSize: 12.5,
+      paraSpaceAfterPt: 5,
       fillTransparency: 100,
     }
   );
@@ -711,75 +817,24 @@ function addSlide2() {
     slide,
     "Penalties",
     [
-      "A step penalty of -1 discourages wandering without progress.",
-      "Additional penalty is applied when the danger level around Pac-Man is high.",
-      "Exceeding the step limit causes a timeout penalty of -250.",
-      "Dying causes a large negative reward to strongly discourage losing lives."
+      "Step cost: -1",
+      "Danger pressure: -0.5 × threat pressure",
+      "Timeout at 900 steps: -250",
+      "Death: large negative reward including score reset loss"
     ],
     {
-      x: 6.9,
-      y: 2.72,
-      w: 5.75,
-      h: 3.82,
+      x: 8.87,
+      y: 3.45,
+      w: 3.78,
+      h: 2.48,
       fillColor: COLORS.glass,
       lineColor: COLORS.red,
       titleColor: COLORS.darkRed,
-      fontSize: 15,
-      paraSpaceAfterPt: 8,
+      fontSize: 12.5,
+      paraSpaceAfterPt: 5,
       fillTransparency: 100,
     }
   );
-
-  addMetricCard(slide, "STEP COST", "-1", {
-    x: 0.7,
-    y: 6.58,
-    w: 1.95,
-    h: 0.72,
-    fillColor: COLORS.glass,
-    lineColor: COLORS.blue,
-    valueColor: COLORS.darkBlue,
-    fillTransparency: 100,
-  });
-  addMetricCard(slide, "CLEAR BONUS", "+500", {
-    x: 2.88,
-    y: 6.58,
-    w: 2.2,
-    h: 0.72,
-    fillColor: COLORS.glass,
-    lineColor: COLORS.teal,
-    valueColor: COLORS.darkTeal,
-    fillTransparency: 100,
-  });
-  addMetricCard(slide, "TIMEOUT", "-250", {
-    x: 5.32,
-    y: 6.58,
-    w: 2.1,
-    h: 0.72,
-    fillColor: COLORS.glass,
-    lineColor: COLORS.gold,
-    valueColor: "A66A00",
-    fillTransparency: 100,
-  });
-  addMetricCard(slide, "DEATH", "LARGE -", {
-    x: 7.64,
-    y: 6.58,
-    w: 2.1,
-    h: 0.72,
-    fillColor: COLORS.glass,
-    lineColor: COLORS.red,
-    valueColor: COLORS.darkRed,
-    fillTransparency: 100,
-  });
-  addSummaryBand(slide, "The reward function is shaped to balance score, safety, and efficiency instead of only maximizing immediate points.", {
-    x: 9.98,
-    y: 6.58,
-    w: 2.67,
-    h: 0.72,
-    fillColor: COLORS.glass,
-    lineColor: COLORS.line,
-    fontSize: 10,
-    fillTransparency: 100,
-  });
 
   warnIfSlideHasOverlaps(slide, pptx);
   warnIfSlideElementsOutOfBounds(slide, pptx);
