@@ -46,7 +46,7 @@ const PACMAN_ICON = path.resolve(__dirname, "../pacman/public/icon/favicon.png")
 const CHERRIES_ICON = path.resolve(__dirname, "ui_fruit_cherries.png");
 const GHOST_BONUS_ICON = path.resolve(__dirname, "ui_ghost_blue.png");
 const GAMEPLAY_SHOT = path.resolve(__dirname, "../pacman/shots/pac.png");
-const PACMAN_BG_SOFT = path.resolve(__dirname, "pacman_neon_bg_light.png");
+const PACMAN_BG_SOFT = path.resolve(__dirname, "pacman_neon_bg.png");
 
 function addHeader(slide, _kicker, title, accent) {
   slide.addText(title, {
