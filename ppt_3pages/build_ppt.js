@@ -207,20 +207,30 @@ function addInlineMetricCard(slide, label, value, opts = {}) {
     linePt: 1.4,
   });
 
-  slide.addText([
-    { text: `${label}  `, options: { bold: true, color: COLORS.textSoft } },
-    { text: value, options: { bold: true, color: opts.valueColor ?? COLORS.white } },
-  ], {
-    x: opts.x + 0.22,
-    y: opts.y + 0.29,
-    w: opts.w - 0.44,
-    h: 0.22,
+  slide.addText(label, {
+    x: opts.x + 0.15,
+    y: opts.y + 0.12,
+    w: opts.w - 0.3,
+    h: 0.2,
     fontFace: "Arial",
-    fontSize: opts.fontSize ?? 15,
+    fontSize: opts.labelFontSize ?? 10,
+    bold: true,
+    color: COLORS.textSoft,
     margin: 0,
     align: "center",
-    valign: "mid",
-    breakLine: false,
+  });
+
+  slide.addText(value, {
+    x: opts.x + 0.15,
+    y: opts.y + 0.38,
+    w: opts.w - 0.3,
+    h: 0.24,
+    fontFace: "Arial",
+    fontSize: opts.valueFontSize ?? 14,
+    bold: true,
+    color: opts.valueColor ?? COLORS.white,
+    margin: 0,
+    align: "center",
   });
 }
 
@@ -718,7 +728,8 @@ function addSlide2() {
     lineColor: COLORS.blue,
     valueColor: COLORS.white,
     fillTransparency: 20,
-    fontSize: 9.5,
+    labelFontSize: 9,
+    valueFontSize: 13,
   });
   addInlineMetricCard(slide, "FRUIT/GHOST", "Bns/+200~1600", {
     x: 2.71,
@@ -729,7 +740,8 @@ function addSlide2() {
     lineColor: COLORS.gold,
     valueColor: COLORS.white,
     fillTransparency: 20,
-    fontSize: 8.6,
+    labelFontSize: 9,
+    valueFontSize: 11,
   });
   addInlineMetricCard(slide, "ESCAPE/CHASE", "+1.5/+3", {
     x: 4.72,
@@ -740,7 +752,8 @@ function addSlide2() {
     lineColor: COLORS.teal,
     valueColor: COLORS.white,
     fillTransparency: 20,
-    fontSize: 8.8,
+    labelFontSize: 9,
+    valueFontSize: 13,
   });
   addInlineMetricCard(slide, "FRUIT/CLEAR", "+2/+500", {
     x: 6.73,
@@ -751,7 +764,8 @@ function addSlide2() {
     lineColor: COLORS.teal,
     valueColor: COLORS.white,
     fillTransparency: 20,
-    fontSize: 9.2,
+    labelFontSize: 9,
+    valueFontSize: 13,
   });
   addInlineMetricCard(slide, "STEP/PRESS.", "-1/-0.5×P", {
     x: 8.74,
@@ -762,7 +776,8 @@ function addSlide2() {
     lineColor: COLORS.red,
     valueColor: COLORS.white,
     fillTransparency: 20,
-    fontSize: 8.8,
+    labelFontSize: 9,
+    valueFontSize: 12,
   });
   addInlineMetricCard(slide, "TIMEOUT/DEATH", "-250/Large-", {
     x: 10.75,
@@ -773,7 +788,8 @@ function addSlide2() {
     lineColor: COLORS.red,
     valueColor: COLORS.white,
     fillTransparency: 20,
-    fontSize: 8.4,
+    labelFontSize: 9,
+    valueFontSize: 11,
   });
 
   addSectionCard(
