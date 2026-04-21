@@ -571,6 +571,111 @@ function addBulletParagraph(slide, items, opts = {}) {
   });
 }
 
+function addIntroSlide() {
+  const slide = pptx.addSlide();
+  slide.background = { color: COLORS.white };
+  addPacmanBackground(slide);
+  slide.addShape(pptx.ShapeType.rect, {
+    x: 0,
+    y: 0,
+    w: 13.333,
+    h: 7.5,
+    line: { color: "000000", transparency: 100 },
+    fill: { color: "000000", transparency: 58 },
+  });
+  addHeader(slide, "", "Project Overview", COLORS.gold);
+
+  addSummaryBand(slide, "Decision-Theoretic Navigation Under Uncertainty in Dynamic Grids", {
+    x: 0.7,
+    y: 1.58,
+    w: 11.95,
+    h: 0.72,
+    fillColor: "1A2030",
+    lineColor: COLORS.gold,
+    fontSize: 19,
+    bold: true,
+    fillTransparency: 20,
+  });
+
+  slide.addText("Participants", {
+    x: 0.7,
+    y: 2.58,
+    w: 2.2,
+    h: 0.24,
+    fontFace: "Arial",
+    fontSize: 12,
+    bold: true,
+    color: COLORS.textSoft,
+    margin: 0,
+  });
+
+  const participantCards = [
+    { name: "Michael Liu", x: 0.7, color: COLORS.blue },
+    { name: "Ruiding Feng", x: 4.39, color: COLORS.teal },
+    { name: "Zhichun Xiao", x: 8.08, color: COLORS.gold },
+  ];
+
+  for (const card of participantCards) {
+    addPanel(slide, {
+      x: card.x,
+      y: 2.88,
+      w: 3.2,
+      h: 0.92,
+      fillColor: "1A2030",
+      lineColor: card.color,
+      linePt: 1.3,
+      fillTransparency: 20,
+    });
+    slide.addText(card.name, {
+      x: card.x + 0.18,
+      y: 3.18,
+      w: 2.84,
+      h: 0.24,
+      fontFace: "Arial",
+      fontSize: 17,
+      bold: true,
+      color: COLORS.white,
+      align: "center",
+      margin: 0,
+    });
+  }
+
+  addSectionCard(
+    slide,
+    "Major Objective",
+    [
+      "Study decision-making under uncertainty through a stochastic navigation problem.",
+      "Use a Pac-Man-style environment to model pursuit, risk, and long-horizon planning.",
+      "Learn a policy that maximizes score while aiming for a no-death level clear."
+    ],
+    {
+      x: 0.7,
+      y: 4.12,
+      w: 11.95,
+      h: 1.64,
+      fillColor: "1A2030",
+      lineColor: COLORS.teal,
+      fontSize: 16,
+      paraSpaceAfterPt: 7,
+      fillTransparency: 20,
+    }
+  );
+
+  addSummaryBand(slide, "This progress update focuses on the current RL formulation, reward design, and optimization strategy.", {
+    x: 0.7,
+    y: 6.04,
+    w: 11.95,
+    h: 0.5,
+    fillColor: "1A2030",
+    lineColor: COLORS.line,
+    fontSize: 14,
+    fillTransparency: 20,
+  });
+
+  warnIfSlideHasOverlaps(slide, pptx);
+  warnIfSlideElementsOutOfBounds(slide, pptx);
+}
+
 function addSlide1() {
   const slide = pptx.addSlide();
   slide.background = { color: COLORS.white };
@@ -693,7 +798,7 @@ function addSlide2() {
   const slide = pptx.addSlide();
   slide.background = { color: COLORS.white };
   addPacmanBackground(slide);
-  addHeader(slide, "Slide 2", "Q-Learning Update Rule", COLORS.teal);
+  addHeader(slide, "Slide 2", "Q-Learning Update Rule (RL)", COLORS.teal);
 
   slide.addText("Markov Decision Process (MDP)", {
     x: 0.7,
@@ -1054,6 +1159,7 @@ function addSlide3() {
   warnIfSlideElementsOutOfBounds(slide, pptx);
 }
 
+addIntroSlide();
 addSlide1();
 addSlide2();
 addSlide3();
