@@ -43,10 +43,10 @@ const COLORS = {
 };
 
 const PACMAN_ICON = path.resolve(__dirname, "../pacman/public/icon/favicon.png");
-const CHERRIES_ICON = path.resolve(__dirname, "ui_fruit_cherries.png");
-const GHOST_BONUS_ICON = path.resolve(__dirname, "ui_ghost_blue.png");
+const CHERRIES_ICON = path.resolve(__dirname, "images/ui_fruit_cherries.png");
+const GHOST_BONUS_ICON = path.resolve(__dirname, "images/ui_ghost_blue.png");
 const GAMEPLAY_SHOT = path.resolve(__dirname, "../pacman/shots/pac.png");
-const PACMAN_BG_SOFT = path.resolve(__dirname, "pacman_neon_bg.png");
+const PACMAN_BG_SOFT = path.resolve(__dirname, "images/pacman_neon_bg.png");
 
 function addHeader(slide, _kicker, title, accent) {
   slide.addText(title, {
@@ -693,7 +693,7 @@ function addSlide2() {
   const slide = pptx.addSlide();
   slide.background = { color: COLORS.white };
   addPacmanBackground(slide);
-  addHeader(slide, "Slide 2", "Reward and Penalty Design", COLORS.teal);
+  addHeader(slide, "Slide 2", "Q-Learning Update Rule", COLORS.teal);
 
   slide.addText("Markov Decision Process (MDP)", {
     x: 0.7,
@@ -719,10 +719,10 @@ function addSlide2() {
     margin: 0,
   });
 
-  slide.addText("Reward and Penalty Design", {
+  slide.addText("How the formula updates action values from reward and future return", {
     x: 0.7,
     y: 2.18,
-    w: 3.5,
+    w: 7.2,
     h: 0.22,
     fontFace: "Arial",
     fontSize: 12,
