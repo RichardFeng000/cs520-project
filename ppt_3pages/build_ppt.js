@@ -719,9 +719,21 @@ function addSlide2() {
     margin: 0,
   });
 
+  slide.addText("Reward and Penalty Design", {
+    x: 0.7,
+    y: 2.18,
+    w: 3.5,
+    h: 0.22,
+    fontFace: "Arial",
+    fontSize: 12,
+    bold: true,
+    color: COLORS.textSoft,
+    margin: 0,
+  });
+
   addInlineMetricCard(slide, "PELLET/E.", "+10/+50", {
     x: 0.7,
-    y: 2.45,
+    y: 2.54,
     w: 1.9,
     h: 0.72,
     fillColor: "1A2030",
@@ -733,7 +745,7 @@ function addSlide2() {
   });
   addInlineMetricCard(slide, "FRUIT/GHOST", "Bns/+200~1600", {
     x: 2.71,
-    y: 2.45,
+    y: 2.54,
     w: 1.9,
     h: 0.72,
     fillColor: "1A2030",
@@ -745,7 +757,7 @@ function addSlide2() {
   });
   addInlineMetricCard(slide, "ESCAPE/CHASE", "+1.5/+3", {
     x: 4.72,
-    y: 2.45,
+    y: 2.54,
     w: 1.9,
     h: 0.72,
     fillColor: "1A2030",
@@ -757,7 +769,7 @@ function addSlide2() {
   });
   addInlineMetricCard(slide, "FRUIT/CLEAR", "+2/+500", {
     x: 6.73,
-    y: 2.45,
+    y: 2.54,
     w: 1.9,
     h: 0.72,
     fillColor: "1A2030",
@@ -769,7 +781,7 @@ function addSlide2() {
   });
   addInlineMetricCard(slide, "STEP/PRESS.", "-1/-0.5×P", {
     x: 8.74,
-    y: 2.45,
+    y: 2.54,
     w: 1.9,
     h: 0.72,
     fillColor: "1A2030",
@@ -781,7 +793,7 @@ function addSlide2() {
   });
   addInlineMetricCard(slide, "TIMEOUT/DEATH", "-250/Large-", {
     x: 10.75,
-    y: 2.45,
+    y: 2.54,
     w: 1.9,
     h: 0.72,
     fillColor: "1A2030",
@@ -803,7 +815,7 @@ function addSlide2() {
     ],
     {
       x: 0.7,
-      y: 3.45,
+      y: 3.56,
       w: 3.78,
       h: 2.48,
       fillColor: "1A2030",
@@ -826,7 +838,7 @@ function addSlide2() {
     ],
     {
       x: 4.78,
-      y: 3.45,
+      y: 3.56,
       w: 3.78,
       h: 2.48,
       fillColor: "1A2030",
@@ -849,7 +861,7 @@ function addSlide2() {
     ],
     {
       x: 8.87,
-      y: 3.45,
+      y: 3.56,
       w: 3.78,
       h: 2.48,
       fillColor: "1A2030",
@@ -868,42 +880,175 @@ function addSlide2() {
 function addSlide3() {
   const slide = pptx.addSlide();
   slide.background = { color: COLORS.white };
-  addHeader(slide, "Slide 3", "Discussion Placeholder", COLORS.gold);
-
-  slide.addShape(pptx.ShapeType.roundRect, {
-    x: 1.05,
-    y: 2.2,
-    w: 11.2,
-    h: 3.6,
-    rectRadius: 0.1,
-    line: { color: COLORS.gold, pt: 2, dash: "dash" },
-    fill: { color: "FFF9E8" },
+  addPacmanBackground(slide);
+  slide.addShape(pptx.ShapeType.rect, {
+    x: 0,
+    y: 0,
+    w: 13.333,
+    h: 7.5,
+    line: { color: "000000", transparency: 100 },
+    fill: { color: "000000", transparency: 55 },
   });
+  addHeader(slide, "Slide 3", "Optimization", COLORS.gold);
 
-  slide.addText("Content to be added later", {
-    x: 3.45,
-    y: 3.05,
-    w: 6.4,
-    h: 0.55,
-    align: "center",
-    fontFace: "Arial",
-    fontSize: 26,
+  addSummaryBand(slide, "Goal: clear the level without losing a single life.", {
+    x: 0.7,
+    y: 1.7,
+    w: 11.95,
+    h: 0.56,
+    fillColor: "1A2030",
+    lineColor: COLORS.gold,
+    fontSize: 18,
     bold: true,
-    color: COLORS.ink,
+    fillTransparency: 20,
+  });
+
+  slide.addText("Death Handling Mechanisms", {
+    x: 0.7,
+    y: 2.48,
+    w: 5.2,
+    h: 0.3,
+    fontFace: "Arial",
+    fontSize: 14,
+    bold: true,
+    color: COLORS.white,
     margin: 0,
   });
 
-  slide.addText("Reserved for the final discussion point.", {
-    x: 3.25,
-    y: 3.82,
-    w: 6.8,
-    h: 0.35,
-    align: "center",
+  slide.addShape(pptx.ShapeType.line, {
+    x: 0.7,
+    y: 2.8,
+    w: 2.55,
+    h: 0,
+    line: { color: COLORS.gold, pt: 1.1, transparency: 18 },
+  });
+
+  addSectionCard(
+    slide,
+    "Model 1",
+    [
+      "Pac-Man has 3 lives.",
+      "Rewards keep accumulating across lives.",
+      "Dying does not reset the score."
+    ],
+    {
+      x: 0.7,
+      y: 3.0,
+      w: 3.75,
+      h: 2.5,
+      fillColor: "1A2030",
+      lineColor: COLORS.blue,
+      fontSize: 13.5,
+      paraSpaceAfterPt: 6,
+      fillTransparency: 20,
+    }
+  );
+
+  addSectionCard(
+    slide,
+    "Model 2",
+    [
+      "Pac-Man has 3 lives.",
+      "If Pac-Man dies, the score resets to 0.",
+      "This creates a much stronger penalty for death."
+    ],
+    {
+      x: 4.79,
+      y: 3.0,
+      w: 3.75,
+      h: 2.5,
+      fillColor: "1A2030",
+      lineColor: COLORS.teal,
+      fontSize: 13.5,
+      paraSpaceAfterPt: 6,
+      fillTransparency: 20,
+    }
+  );
+
+  addSectionCard(
+    slide,
+    "Model 3",
+    [
+      "Pac-Man has 3 lives.",
+      "If Pac-Man dies, the next life starts from a score below 0.",
+      "This is the harshest death penalty among the three models."
+    ],
+    {
+      x: 8.88,
+      y: 3.0,
+      w: 3.75,
+      h: 2.5,
+      fillColor: "1A2030",
+      lineColor: COLORS.red,
+      fontSize: 13.5,
+      paraSpaceAfterPt: 6,
+      fillTransparency: 20,
+    }
+  );
+
+  slide.addText("Example Start Values (if each death happens after reaching 1200 points)", {
+    x: 0.7,
+    y: 5.62,
+    w: 7.6,
+    h: 0.22,
     fontFace: "Arial",
-    fontSize: 16,
-    color: COLORS.muted,
+    fontSize: 11,
+    bold: true,
+    color: COLORS.textSoft,
     margin: 0,
   });
+
+  const lifeCards = [
+    { title: "Model 1 Start Value", lines: ["Life 1: 0", "Life 2: 1200", "Life 3: 2400"], x: 0.7, lineColor: COLORS.blue },
+    { title: "Model 2 Start Value", lines: ["Life 1: 0", "Life 2: 0", "Life 3: 0"], x: 4.79, lineColor: COLORS.teal },
+    { title: "Model 3 Start Value", lines: ["Life 1: 0", "Life 2: -360", "Life 3: -720"], x: 8.88, lineColor: COLORS.red },
+  ];
+
+  for (const card of lifeCards) {
+    addPanel(slide, {
+      x: card.x,
+      y: 5.88,
+      w: 3.75,
+      h: 1.12,
+      fillColor: "1A2030",
+      lineColor: card.lineColor,
+      linePt: 1.3,
+      fillTransparency: 20,
+    });
+
+    slide.addText(card.title, {
+      x: card.x + 0.25,
+      y: 6.03,
+      w: 2.95,
+      h: 0.22,
+      fontFace: "Arial",
+      fontSize: 11.5,
+      bold: true,
+      color: COLORS.white,
+      margin: 0,
+    });
+
+    slide.addShape(pptx.ShapeType.line, {
+      x: card.x + 0.25,
+      y: 6.28,
+      w: 3.15,
+      h: 0,
+      line: { color: card.lineColor, pt: 1, transparency: 18 },
+    });
+
+    slide.addText(card.lines.join("\n"), {
+      x: card.x + 0.25,
+      y: 6.44,
+      w: 3.1,
+      h: 0.42,
+      fontFace: "Arial",
+      fontSize: 10.5,
+      color: COLORS.white,
+      margin: 0,
+      breakLine: true,
+      paraSpaceAfterPt: 2,
+    });
+  }
 
   warnIfSlideHasOverlaps(slide, pptx);
   warnIfSlideElementsOutOfBounds(slide, pptx);
