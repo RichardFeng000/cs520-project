@@ -475,7 +475,155 @@ waiting for a pellet to free up — high hazard exposure (201) but
 respectable time-to-failure (156). It is essentially the opposite of the
 Q-learning trade-off: it tolerates risk to extend survival.
 
-## 10. Conclusion
+## 10. Real-World Applications
+
+The decision-theoretic navigation problem we studied — pick actions in a
+dynamic environment where the future positions of mobile hazards are
+uncertain — has direct analogues in two large research communities:
+**developmental cognitive science** (how humans, and especially children,
+learn to plan under risk) and **autonomous driving** (how artificial
+agents must plan around moving traffic in safety-critical settings). We
+discuss one canonical paper from each, chosen because each maps onto a
+specific architectural choice in our agent line-up.
+
+### 10.1 Cognitive science — model-based control as a developmental milestone
+
+Decker, Otto, Daw, and Hartley (2016), *"From Creatures of Habit to
+Goal-Directed Learners: Tracking the Developmental Emergence of
+Model-Based Reinforcement Learning"* [5]. Published in *Psychological
+Science*; one of the most widely-cited recent papers in developmental
+computational neuroscience.
+
+Decker et al. used the now-canonical **two-stage Markov decision task**
+(Daw et al., 2011) to measure how strongly human participants — children,
+adolescents, and adults — rely on **model-based** versus **model-free**
+reinforcement learning. The model-free agent (in psychology terms, a
+*creature of habit*) caches the value of state–action pairs from past
+outcomes; the model-based agent (a *goal-directed learner*) explicitly
+simulates the consequences of each action using a learned transition
+model and picks the highest-utility plan. The paper's headline result is
+that the model-based contribution to choices grows substantially from
+childhood through adulthood, and that adolescents who score highest on
+working-memory measures are the ones most able to deploy model-based
+control.
+
+**Why this paper maps onto our project.** Our agent zoo is *exactly* the
+two halves of the Decker et al. taxonomy:
+
+| Their construct | Our instantiation |
+|---|---|
+| Model-free RL (cached value, no simulation) | `qlearning_model{1,2,3}` — a Q-table indexed by bucketed features |
+| Model-based RL (simulate the future, plan the response) | `astar_replan` and `astar_risk_l*` — replan every step using `transition_distribution` to simulate ghost moves |
+
+Two echoes between their cognitive findings and our agent results stand
+out:
+
+1. **Model-based control wins on raw score in environments with learnable
+   structure.** Decker et al. report that adults with stronger
+   model-based contributions earn significantly more reward than
+   model-free participants on the same trials. Our 50-episode Monte
+   Carlo shows the same pattern at the algorithmic level: the
+   model-based planners earn ~2,200 mean score versus 569–1,089 for the
+   Q-learning models, and they are the *only* family that ever clears
+   the level (14% of episodes — see Section §8.1 and §8.3).
+
+2. **The two control modes coexist rather than replace each other.** In
+   their data, model-free habits do not vanish in adults; they are
+   *blended* with planning. Our project shows the same coexistence: the
+   Q-learners spend ~6× less time in ghost-radius-2 hazard than the
+   planners (Section §8.5), so the cached-value strategy occupies a
+   genuine niche — caution under uncertainty — even when it loses on raw
+   score. A practical real-world cognitive system, the paper argues,
+   should be a *blend* that uses planning when the model is reliable and
+   cached habits when computation is expensive or the model is wrong;
+   our hazard-vs-reward Pareto plot (Figure 5) is the same claim in
+   miniature.
+
+The paper is therefore a strong external justification for why building
+*both* a planning agent and a learning agent in our project is the right
+experimental design rather than picking one paradigm a priori — humans
+do both, and they do both for principled reasons.
+
+### 10.2 Autonomous driving — confidence-aware safe improvement
+
+Cao, Jiang, Zhou, Xu, Peng, and Yang (2023), *"Continuous Improvement of
+Self-Driving Cars Using Dynamic Confidence-Aware Reinforcement Learning"*
+[6]. Published in *Nature Machine Intelligence*; among the most
+prominent recent papers on safe RL for autonomous vehicles.
+
+Cao et al. address the central tension in deploying RL controllers on
+real cars: the policy should keep getting better as it accumulates
+real-world driving data, but it must never get *worse* on safety-critical
+metrics during the improvement process. Their method ("DCARL")
+attaches a learned **confidence estimate** to each decision and falls
+back to a conservative baseline policy whenever the RL component's
+confidence is below threshold. Empirically they show that DCARL achieves
+monotonic safety improvement on simulated and real driving tasks, in
+contrast with vanilla deep RL whose performance is non-monotonic in the
+amount of training data.
+
+**Why this paper maps onto our project.** The architectural parallel to
+our risk-aware A\* is direct, and the math is essentially the same:
+
+| Their construct | Our instantiation |
+|---|---|
+| Confidence estimate `c(s)` | Expected hazard probability `E[risk(n)]` |
+| Soft cost augmentation by uncertainty | `f(n) = g(n) + h(n) + λ · E[risk(n)]` |
+| Hard rule-based vetoes (no oncoming-traffic moves) | `ghost_obstacle_cells` — hard wall around ghost current + 1-step neighbour |
+| Fall-back conservative policy | `greedy_legal_action` fallback when no safe path exists |
+
+In both cases the controller's objective is augmented by a scalar that
+**up-weights cautious behaviour in proportion to estimated uncertainty
+about the future state**. The difference is purely in engineering depth:
+they *learn* the confidence estimator from real and simulated driving
+data; we *compute* the risk term analytically from a maximum-entropy
+ghost transition model.
+
+Three lessons from Cao et al. that explain our results in retrospect:
+
+1. **The risk/confidence term is a safety floor, not a performance
+   ceiling.** DCARL never under-performs the baseline on safety metrics,
+   but its average reward also rarely *exceeds* the baseline by a wide
+   margin — the confidence term is most valuable in long-tail risky
+   states. This matches our λ-sweep finding (Section §8.6): risk-aware
+   A\* is statistically indistinguishable from replanning A\* on the
+   easy Pac-Man maze (where the integrated risk over planned cells is
+   small), but it provides a guaranteed cost on cells with non-trivial
+   ghost-arrival probability.
+
+2. **Hard masking complements soft penalisation.** In their pipeline,
+   hard rule-based vetoes sit alongside the soft confidence term; the
+   soft term only matters in the gray zone. We saw the analogue: our
+   `ghost_obstacle_cells` already excludes the ghost's current cell and
+   predicted 1-step neighbour as hard walls, leaving only the gray zone
+   for `λ · E[risk]` to act on, which is exactly why our λ-sweep was
+   flat (Section §8.6, Section §9.2).
+
+3. **Confidence-aware RL is the production form of our risk-aware A\*.**
+   A natural follow-up to our project is to *learn* the risk model
+   rather than assume the maximum-entropy uniform-over-legal-moves
+   transition. Cao et al.'s framework is the template: train a
+   probabilistic ghost-trajectory predictor on observed play, plug its
+   posterior uncertainty into the cost function, and fall back to the
+   planner when the predictor's confidence is low. This is also the
+   recommendation we make in Section §12 ("Expanded hazard model").
+
+### 10.3 Synthesis
+
+The common thread across the two literatures is that **explicit
+reasoning about *future* uncertainty** is what separates safe,
+generalisable agents from brittle ones. Children gradually develop a
+goal-directed planning system because the world rewards it; production
+self-driving systems gradually layer a confidence-aware planning system
+on top of reflexive control because the cost of an unmodelled hazard is
+unacceptable. Our Pac-Man study is a small, controlled instance of the
+same architectural choice: replanning A\* dominates static A\* by ~5×
+in time-to-failure (Section §8.3), and the risk-aware variant gives a
+clean place to grow into a learned uncertainty model. The Pac-Man maze
+is a toy, but the architectural lesson it teaches is the same one the
+cognitive-science and autonomous-driving fields validate at scale.
+
+## 11. Conclusion
 
 We answered the proposal's research question with a paired-seed
 Monte-Carlo study across 11 agent configurations. The headline conclusions
@@ -498,7 +646,7 @@ are:
    highest-exposure agent** — useful as a foil that makes the planner /
    learner trade-offs concrete.
 
-## 11. Limitations and Future Work
+## 12. Limitations and Future Work
 
 - **Random-grid generalization** (proposal §8): the harness supports
   arbitrary maze layouts, but the random-grid procedural generator was
@@ -518,7 +666,7 @@ are:
   observed trajectories) would tighten the per-tile risk estimates and
   give λ more leverage.
 
-## 12. Team Contributions
+## 13. Team Contributions
 
 - **Michael Liu** — overall architecture and experimental design;
   implementation of the search-agent pipeline (`Agents/_search.py`,
@@ -532,7 +680,7 @@ are:
 - **Zhichun Xiao** — final report (this document); cross-checking of
   experimental numbers against `summary_n50_seed1000.json`.
 
-## 13. References
+## 14. References
 
 [1] P. E. Hart, N. J. Nilsson, and B. Raphael, "A Formal Basis for the
 Heuristic Determination of Minimum Cost Paths," *IEEE Transactions on
@@ -550,6 +698,18 @@ Learning", and Chapter 16, "Applications and Case Studies".)
 [4] D. Klein and P. Abbeel, "CS188: Introduction to Artificial
 Intelligence — Pac-Man Projects," UC Berkeley course materials.
 [http://ai.berkeley.edu](http://ai.berkeley.edu)
+
+[5] J. H. Decker, A. R. Otto, N. D. Daw, and C. A. Hartley, "From
+Creatures of Habit to Goal-Directed Learners: Tracking the Developmental
+Emergence of Model-Based Reinforcement Learning," *Psychological Science*,
+vol. 27, no. 6, pp. 848–858, 2016. doi: 10.1177/0956797616639301.
+[https://journals.sagepub.com/doi/10.1177/0956797616639301](https://journals.sagepub.com/doi/10.1177/0956797616639301)
+
+[6] Z. Cao, K. Jiang, W. Zhou, S. Xu, H. Peng, and D. Yang, "Continuous
+Improvement of Self-Driving Cars Using Dynamic Confidence-Aware
+Reinforcement Learning," *Nature Machine Intelligence*, vol. 5, pp.
+145–158, Feb. 2023. doi: 10.1038/s42256-023-00610-y.
+[https://www.nature.com/articles/s42256-023-00610-y](https://www.nature.com/articles/s42256-023-00610-y)
 
 ---
 
