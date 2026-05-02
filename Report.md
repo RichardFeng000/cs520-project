@@ -668,17 +668,21 @@ are:
 
 ## 13. Team Contributions
 
-- **Michael Liu** — overall architecture and experimental design;
-  implementation of the search-agent pipeline (`Agents/_search.py`,
+- **Ruiding Feng** — Pac-Man deployment (browser-side game integration,
+  build pipeline at `pacman/build.sh`, in-game UI surface), the entirety
+  of the reinforcement-learning training stack (`RL/rl_q_learning.py`,
+  the three death-policy variants in `RL/models/`, hyperparameter
+  selection, training-time logging), and interactive UI design for the
+  agent selector and debug overlays.
+- **Michael Liu** — implementation of every other model and the
+  analysis pipeline: the search-agent package (`Agents/_search.py`,
   `Agents/astar_static.py`, `Agents/astar_replan.py`,
-  `Agents/astar_risk.py`, `Agents/observation.py`); evaluation harness
-  (`Agents/eval/`) and analysis notebook + figure pipeline
-  (`notebooks/monte_carlo_analysis.ipynb`, `Agents/eval/render_figures.py`).
-- **Ruiding Feng** — browser-side Pac-Man integration of the agents
-  (`pacman/src/agents/*.js`); UI polish for the in-game agent selector;
-  Monte-Carlo experiment driver and CSV pipeline.
-- **Zhichun Xiao** — final report (this document); cross-checking of
-  experimental numbers against `summary_n50_seed1000.json`.
+  `Agents/astar_risk.py`, `Agents/observation.py`), the hand-coded
+  heuristic and random baselines, the Monte Carlo evaluation harness
+  (`Agents/eval/`), the comparison notebook
+  (`notebooks/monte_carlo_analysis.ipynb`), and the figure-rendering
+  pipeline (`Agents/eval/render_figures.py`).
+- **Zhichun Xiao** — final report (this document).
 
 ## 14. References
 
