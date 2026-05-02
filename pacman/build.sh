@@ -77,6 +77,10 @@ for file in \
     sprites.js \
     Actor.js \
     Ghost.js \
+    agents/search.js \
+    agents/astarStatic.js \
+    agents/astarReplan.js \
+    agents/astarRisk.js \
     Player.js \
     actors.js \
     targets.js \

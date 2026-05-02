@@ -10,10 +10,14 @@ var GAME_OTTO = 3;
 var practiceMode = false;
 var turboMode = false;
 
-var AI_STRATEGY_TRADITIONAL = "traditional";
+var AI_STRATEGY_ASTAR = "astar";
+var AI_STRATEGY_REPLAN = "replan";
+var AI_STRATEGY_RISK = "risk";
 var AI_STRATEGY_RL = "rl";
 var AI_STRATEGY_ORDER = [
-    AI_STRATEGY_TRADITIONAL,
+    AI_STRATEGY_ASTAR,
+    AI_STRATEGY_REPLAN,
+    AI_STRATEGY_RISK,
     AI_STRATEGY_RL,
 ];
 var rlModelLibrary = (typeof window != "undefined" && window.__PACMAN_MODEL_LIBRARY__) ? window.__PACMAN_MODEL_LIBRARY__ : {};
@@ -98,7 +102,16 @@ var getAiStrategyLabel = function(strategy) {
     if (strategy == AI_STRATEGY_RL) {
         return "RL POLICY";
     }
-    return "TRADITIONAL";
+    if (strategy == AI_STRATEGY_ASTAR) {
+        return "A*";
+    }
+    if (strategy == AI_STRATEGY_REPLAN) {
+        return "REPLAN";
+    }
+    if (strategy == AI_STRATEGY_RISK) {
+        return "RISK-AWARE";
+    }
+    return "A*";
 };
 
 // current game mode
@@ -230,7 +243,7 @@ var clearCheats, backupCheats, restoreCheats;
     clearCheats = function() {
         pacman.invincible = false;
         pacman.ai = false;
-        pacman.setAiMode(AI_STRATEGY_TRADITIONAL);
+        pacman.setAiMode(AI_STRATEGY_ASTAR);
         for (i=0; i<5; i++) {
             actors[i].isDrawPath = false;
             actors[i].isDrawTarget = false;

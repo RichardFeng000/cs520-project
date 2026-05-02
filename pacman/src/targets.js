@@ -217,7 +217,10 @@ pacman.drawTarget = function(ctx) {
     ctx.fillStyle = this.color;
     var px,py;
 
-    if (this.targetting == AI_STRATEGY_TRADITIONAL || this.targetting == AI_STRATEGY_RL) {
+    if (this.targetting == AI_STRATEGY_RL ||
+        this.targetting == AI_STRATEGY_ASTAR ||
+        this.targetting == AI_STRATEGY_REPLAN ||
+        this.targetting == AI_STRATEGY_RISK) {
         renderer.drawCenterTileSq(ctx, this.targetTile.x, this.targetTile.y, targetSize);
     }
     else if (this.targetting == 'flee') {
@@ -240,7 +243,10 @@ pacman.drawTarget = function(ctx) {
 pacman.getPathDistLeft = function(fromPixel, dirEnum) {
     var distLeft = tileSize;
     var px,py;
-    if (this.targetting == AI_STRATEGY_TRADITIONAL || this.targetting == AI_STRATEGY_RL) {
+    if (this.targetting == AI_STRATEGY_RL ||
+        this.targetting == AI_STRATEGY_ASTAR ||
+        this.targetting == AI_STRATEGY_REPLAN ||
+        this.targetting == AI_STRATEGY_RISK) {
         if (dirEnum == DIR_UP || dirEnum == DIR_DOWN)
             distLeft = Math.abs(fromPixel.y - (this.targetTile.y*tileSize+midTile.y));
         else

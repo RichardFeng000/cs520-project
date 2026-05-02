@@ -15,7 +15,7 @@ var Player = function() {
 
     // determines if this player should be AI controlled
     this.ai = false;
-    this.aiMode = AI_STRATEGY_TRADITIONAL;
+    this.aiMode = AI_STRATEGY_ASTAR;
     this.invincible = false;
 
     this.savedNextDirEnum = {};
@@ -66,8 +66,12 @@ Player.prototype.setNextDir = function(nextDirEnum) {
 };
 
 Player.prototype.setAiMode = function(aiMode) {
-    if (aiMode != AI_STRATEGY_RL) {
-        aiMode = AI_STRATEGY_TRADITIONAL;
+    if (AI_STRATEGY_ORDER.indexOf(aiMode) < 0) {
+        aiMode = AI_STRATEGY_ASTAR;
+    }
+    if (aiMode != this.aiMode) {
+        this._astarPlan = undefined;
+        this._astarTarget = undefined;
     }
     this.aiMode = aiMode;
 };
@@ -104,7 +108,7 @@ Player.prototype.cycleAiMode = function() {
             return this.aiMode;
         }
     }
-    this.setAiMode(AI_STRATEGY_TRADITIONAL);
+    this.setAiMode(AI_STRATEGY_ASTAR);
     return this.aiMode;
 };
 
@@ -529,6 +533,18 @@ Player.prototype.chooseAiDir = function(openTiles) {
     var modelDir;
     var score;
     var i;
+    if (this.aiMode == AI_STRATEGY_ASTAR) {
+        this.targetting = this.aiMode;
+        return chooseAstarStaticDir(this, openTiles);
+    }
+    if (this.aiMode == AI_STRATEGY_REPLAN) {
+        this.targetting = this.aiMode;
+        return chooseAstarReplanDir(this, openTiles);
+    }
+    if (this.aiMode == AI_STRATEGY_RISK) {
+        this.targetting = this.aiMode;
+        return chooseAstarRiskDir(this, openTiles);
+    }
     if (this.aiMode == AI_STRATEGY_RL) {
         modelDir = this.chooseRlModelDir(openTiles);
         if (modelDir != undefined) {
@@ -536,26 +552,24 @@ Player.prototype.chooseAiDir = function(openTiles) {
             this.targetTile = getAiTileInDir(this.tile, modelDir);
             return modelDir;
         }
-    }
-    for (i=0; i<4; i++) {
-        if (!openTiles[i]) {
-            continue;
-        }
-        if (this.aiMode == AI_STRATEGY_RL) {
+        // Q-table miss: fall back to the RL rollout evaluator.
+        for (i=0; i<4; i++) {
+            if (!openTiles[i]) {
+                continue;
+            }
             score = this.evaluateRlMove(this.tile, i, AI_RL_ROLLOUT_DEPTH, {}, 0);
+            if (score > bestScore) {
+                bestScore = score;
+                bestDir = i;
+            }
         }
-        else {
-            score = this.getTraditionalMoveScore(i);
-        }
-        if (score > bestScore) {
-            bestScore = score;
-            bestDir = i;
-        }
+        this.targetting = this.aiMode;
+        this.targetTile = getAiTileInDir(this.tile, bestDir);
+        return bestDir;
     }
-
+    // Unrecognized aiMode safety net.
     this.targetting = this.aiMode;
-    this.targetTile = getAiTileInDir(this.tile, bestDir);
-    return bestDir;
+    return chooseAstarFallbackDir(this, openTiles);
 };
 
 // gets the number of steps to move in this frame

@@ -895,7 +895,7 @@ var initRenderer = function(){
             ctx.textAlign = "right";
             ctx.fillText("1UP", 6*tileSize, 0);
             ctx.fillText(
-                practiceMode ? "PRACTICE " + (pacman.aiMode == AI_STRATEGY_RL ? "RL" : "RULE") : "HIGH SCORE",
+                practiceMode ? "PRACTICE " + pacman.getAiModeLabel() : "HIGH SCORE",
                 19*tileSize,
                 0
             );

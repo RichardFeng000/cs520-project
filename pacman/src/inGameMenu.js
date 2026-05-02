@@ -2,13 +2,27 @@
 // In-Game Menu
 var inGameMenu = (function() {
 
-    var w=tileSize*6,h=tileSize*3;
-    var tradButtonWidth = tileSize*5;
-    var rlButtonWidth = tileSize*4;
-    var modelButtonWidth = tileSize*6;
-    var aiButtonGap = tileSize/2;
+    var h=tileSize*2;
+    var hudButtonFont = Math.max(4, tileSize-4) + "px ArcadeR";
+    var astarButtonWidth = tileSize*2;
+    var replanButtonWidth = tileSize*15/4;
+    var riskButtonWidth = tileSize*3;
+    var menuButtonWidth = tileSize*15/4;
+    var rlButtonWidth = tileSize*7/2;
+    var modelButtonWidth = tileSize*9/2;
+    var aiButtonGap = tileSize/4;
     var aiButtonY = mapHeight;
     var aiButtonsEnabled = false;
+    var aiRowWidth = astarButtonWidth + replanButtonWidth +
+        riskButtonWidth + menuButtonWidth + rlButtonWidth + modelButtonWidth +
+        aiButtonGap*5;
+    var aiRowX = mapWidth/2 - aiRowWidth/2;
+    var astarButtonX = aiRowX;
+    var replanButtonX = astarButtonX + astarButtonWidth + aiButtonGap;
+    var riskButtonX = replanButtonX + replanButtonWidth + aiButtonGap;
+    var menuButtonX = riskButtonX + riskButtonWidth + aiButtonGap;
+    var rlButtonX = menuButtonX + menuButtonWidth + aiButtonGap;
+    var modelButtonX = rlButtonX + rlButtonWidth + aiButtonGap;
 
     var getMainMenu = function() {
         return practiceMode ? practiceMenu : menu;
@@ -21,33 +35,66 @@ var inGameMenu = (function() {
     };
 
     // button to enable in-game menu
-    var btn = new Button(mapWidth/2 - w/2,mapHeight,w,h, function() {
+    var btn = new Button(menuButtonX, aiButtonY, menuButtonWidth, h, function() {
         showMainMenu();
         vcr.onHudDisable();
     });
     btn.setText("MENU");
-    btn.setFont(tileSize+"px ArcadeR","#FFF");
+    btn.setFont(hudButtonFont,"#FFF");
 
-    var aiLeftX = btn.x - aiButtonGap - tradButtonWidth;
-    var aiRightX = btn.x + btn.w + aiButtonGap;
-    var modelButtonX = aiRightX + rlButtonWidth + aiButtonGap;
+    var setCompactToggleLabel = function(button, label) {
+        button.setToggleLabel(label);
+        button.refreshMsg = function() {
+            this.msg = label;
+        };
+    };
 
-    var traditionalAiButton = new ToggleButton(aiLeftX, aiButtonY, tradButtonWidth, h,
+    var astarAiButton = new ToggleButton(astarButtonX, aiButtonY, astarButtonWidth, h,
         function() {
-            return pacman.ai && pacman.aiMode == AI_STRATEGY_TRADITIONAL;
+            return pacman.ai && pacman.aiMode == AI_STRATEGY_ASTAR;
         },
         function(on) {
             if (on) {
-                pacman.enableAiControl(AI_STRATEGY_TRADITIONAL);
+                pacman.enableAiControl(AI_STRATEGY_ASTAR);
             }
-            else if (pacman.aiMode == AI_STRATEGY_TRADITIONAL) {
+            else if (pacman.aiMode == AI_STRATEGY_ASTAR) {
                 pacman.disableAiControl();
             }
         });
-    traditionalAiButton.setFont((tileSize-2)+"px ArcadeR", "#FFF");
-    traditionalAiButton.setToggleLabel("TRAD");
+    astarAiButton.setFont(hudButtonFont, "#FFF");
+    setCompactToggleLabel(astarAiButton, "A*");
 
-    var rlAiButton = new ToggleButton(aiRightX, aiButtonY, rlButtonWidth, h,
+    var replanAiButton = new ToggleButton(replanButtonX, aiButtonY, replanButtonWidth, h,
+        function() {
+            return pacman.ai && pacman.aiMode == AI_STRATEGY_REPLAN;
+        },
+        function(on) {
+            if (on) {
+                pacman.enableAiControl(AI_STRATEGY_REPLAN);
+            }
+            else if (pacman.aiMode == AI_STRATEGY_REPLAN) {
+                pacman.disableAiControl();
+            }
+        });
+    replanAiButton.setFont(hudButtonFont, "#FFF");
+    setCompactToggleLabel(replanAiButton, "REPLAN");
+
+    var riskAiButton = new ToggleButton(riskButtonX, aiButtonY, riskButtonWidth, h,
+        function() {
+            return pacman.ai && pacman.aiMode == AI_STRATEGY_RISK;
+        },
+        function(on) {
+            if (on) {
+                pacman.enableAiControl(AI_STRATEGY_RISK);
+            }
+            else if (pacman.aiMode == AI_STRATEGY_RISK) {
+                pacman.disableAiControl();
+            }
+        });
+    riskAiButton.setFont(hudButtonFont, "#FFF");
+    setCompactToggleLabel(riskAiButton, "RISK");
+
+    var rlAiButton = new ToggleButton(rlButtonX, aiButtonY, rlButtonWidth, h,
         function() {
             return pacman.ai && pacman.aiMode == AI_STRATEGY_RL;
         },
@@ -59,14 +106,14 @@ var inGameMenu = (function() {
                 pacman.disableAiControl();
             }
         });
-    rlAiButton.setFont((tileSize-2)+"px ArcadeR", "#FFF");
+    rlAiButton.setFont(hudButtonFont, "#FFF");
     rlAiButton.setToggleLabel("RL");
 
     var modelButton = new Button(modelButtonX, aiButtonY, modelButtonWidth, h, function() {
         cycleRlModel();
         modelButton.setText(getCurrentRlModelLabel());
     });
-    modelButton.setFont((tileSize-2)+"px ArcadeR", "#FFF");
+    modelButton.setFont(hudButtonFont, "#FFF");
     modelButton.setText(getCurrentRlModelLabel());
 
     var setAiButtonsEnabled = function(enabled) {
@@ -75,13 +122,17 @@ var inGameMenu = (function() {
         }
         aiButtonsEnabled = enabled;
         if (enabled) {
-            traditionalAiButton.enable();
+            astarAiButton.enable();
+            replanAiButton.enable();
+            riskAiButton.enable();
             rlAiButton.enable();
             modelButton.enable();
             modelButton.setText(getCurrentRlModelLabel());
         }
         else {
-            traditionalAiButton.disable();
+            astarAiButton.disable();
+            replanAiButton.disable();
+            riskAiButton.disable();
             rlAiButton.disable();
             modelButton.disable();
         }
@@ -240,7 +291,9 @@ var inGameMenu = (function() {
                 btn.update();
             }
             if (aiButtonsEnabled) {
-                traditionalAiButton.update();
+                astarAiButton.update();
+                replanAiButton.update();
+                riskAiButton.update();
                 rlAiButton.update();
                 modelButton.update();
             }
@@ -254,7 +307,9 @@ var inGameMenu = (function() {
             }
             else {
                 if (aiButtonsEnabled) {
-                    traditionalAiButton.draw(ctx);
+                    astarAiButton.draw(ctx);
+                    replanAiButton.draw(ctx);
+                    riskAiButton.draw(ctx);
                     rlAiButton.draw(ctx);
                     modelButton.draw(ctx);
                 }
