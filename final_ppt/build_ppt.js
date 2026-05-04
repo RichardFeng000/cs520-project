@@ -398,9 +398,9 @@ function addOverviewSlide() {
     slide,
     "Headline Findings",
     [
-      "Replanning A* and Risk-Aware A* tie for top mean score (~2,200) and top clear rate (14% of seeds).",
-      "Static A* (no replan) collapses to ~888 score and 24-step time-to-failure — replanning is the load-bearing trick.",
-      "Q-learning earns ~½ the score but ~6× lower hazard exposure — a fundamentally cautious learned policy.",
+      "Replanning A* and Risk-Aware A* tie for top mean score (~3,150) and top clear rate (14% of seeds).",
+      "Static A* (no replan) reaches 1,479 mean score but dies at step 24 — replanning is the load-bearing trick.",
+      "Q-learning earns ~½ the score but ~6–12× lower hazard exposure — a fundamentally cautious learned policy.",
       "Hand-coded heuristic survives longest (156 steps) but spends the most time near ghosts (hazard 201)."
     ],
     {
@@ -672,10 +672,10 @@ function addScoreComparisonSlide() {
     slide,
     "Read-outs",
     [
-      "astar_replan and astar_risk_l* pile on top of each other near 2,200 — >2× the next group.",
-      "qlearning_model1 (1089) narrowly beats the hand-coded heuristic (1080).",
-      "astar_static collapses to 888 — committing to a t=0 plan walks into ghosts.",
-      "Random sanity floor: 111 ± 13."
+      "astar_replan (3181) and astar_risk_l* (≈3143) pile together — ~2× the next group.",
+      "Heuristic (1695) now leads the middle pack ahead of astar_static (1479) and qlearning_model1 (1439).",
+      "Q-learning models 2/3 sit lower (962, 656) — strong death penalty trades score for caution.",
+      "Random sanity floor: 167 ± 31."
     ],
     {
       x: 8.4,
@@ -692,7 +692,7 @@ function addScoreComparisonSlide() {
 
   addSummaryBand(
     slide,
-    "Take-away — the ×2.5 gap between static A* and the replanning family is the largest architectural delta in the project.",
+    "Take-away — the ~2× gap between static A* and the replanning family is the largest architectural delta in the project.",
     {
       x: 0.7,
       y: 6.06,
@@ -707,7 +707,7 @@ function addScoreComparisonSlide() {
 
   addStandardFooter(
     slide,
-    "Best single run: astar_replan / astar_risk = 7,590 (cleared the level on seeds 1004 and 1039)."
+    "Best single run: astar_replan / astar_risk = 7,800 (cleared the level on 14% of seeds in n=50)."
   );
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -845,9 +845,9 @@ function addRiskRewardSlide() {
     slide,
     "Three clusters",
     [
-      "Q-learners → upper-left, hazard ≈ 15–20.",
-      "Planners (replan / risk-aware) → middle, hazard ≈ 110.",
-      "Heuristic → far right, hazard ≈ 200."
+      "Q-learners → upper-left, hazard ≈ 9–19.",
+      "Planners (replan / risk-aware) → middle, hazard ≈ 110, score ≈ 3,150.",
+      "Heuristic → far right, hazard ≈ 201, score ≈ 1,695."
     ],
     {
       x: 8.4,
@@ -867,7 +867,7 @@ function addRiskRewardSlide() {
     "Why this is the central finding",
     [
       "Q-learning has learned a fundamentally more risk-averse policy.",
-      "~½ the score for ~6× less time within ghost-radius 2.",
+      "~½ the score for ~6–12× less time within ghost-radius 2.",
       "Planned vs cached-value control occupy different Pareto niches — neither dominates.",
       "Sets up the cognitive-science mapping in §10.1."
     ],
@@ -924,7 +924,7 @@ function addQLAblationSlide() {
     slide,
     "Model 1 — keep score on death",
     [
-      "Most score-greedy (1089 mean).",
+      "Most score-greedy (1439 mean).",
       "Longest TTF among the three (≈101 steps).",
       "Death-as-pause encourages risk-tolerant pellet grabs."
     ],
@@ -946,8 +946,8 @@ function addQLAblationSlide() {
     "Model 2 — zero score on death",
     [
       "Sits in the middle (962 mean, ≈87 step TTF).",
-      "Used as the env death policy in the main eval for fair scoring.",
-      "Heavily discourages dying without destabilising training."
+      "Heavily discourages dying without destabilising training.",
+      "Lowest hazard exposure of the three (~15)."
     ],
     {
       x: 4.8,
@@ -966,9 +966,9 @@ function addQLAblationSlide() {
     slide,
     "Model 3 — scaled + ratcheting penalty",
     [
-      "Worst on every metric (569 mean, ≈54 step TTF).",
-      "Highest variance — sometimes scores big, usually dies very early.",
-      "Strong penalty + coarse state ⇒ unstable policy."
+      "Lowest score (656 mean) but TTF ≈ 89 steps after extra training.",
+      "Hazard ≈ 9 — the most cautious of the three.",
+      "Strong penalty teaches survival; score-greed has to be re-learned."
     ],
     {
       x: 8.72,
@@ -985,7 +985,7 @@ function addQLAblationSlide() {
 
   addStandardFooter(
     slide,
-    "Take-away — the death penalty is a tunable cautiousness knob, but the strongest version trains the most volatile policy."
+    "Take-away — the death penalty is a tunable cautiousness knob: stronger penalty ⇒ less score, but lower hazard exposure."
   );
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -1048,7 +1048,7 @@ function addCogSciSlide() {
     "Echo 1 — Model-based wins on raw score",
     [
       "Decker et al.: adults with stronger model-based contributions earn significantly more reward.",
-      "Our run: planners ≈ 2,200 vs Q-learning 569–1,089 mean score.",
+      "Our run: planners ≈ 3,150 vs Q-learning 656–1,439 mean score.",
       "Planners are the only family that ever clears the level (14%)."
     ],
     {
@@ -1069,7 +1069,7 @@ function addCogSciSlide() {
     "Echo 2 — Model-free + model-based coexist",
     [
       "Their data: model-free habits don't vanish in adults — they are blended with planning.",
-      "Our run: Q-learners earn less score but spend ~6× less time within ghost-radius 2.",
+      "Our run: Q-learners earn less score but spend ~6–12× less time within ghost-radius 2.",
       "Cached-value strategy occupies a genuine niche: caution under uncertainty.",
       "Fig. 5 Pareto plot is the same coexistence claim in miniature."
     ],
@@ -1125,7 +1125,7 @@ function addConclusionsSlide() {
     "1. Replanning is the load-bearing innovation",
     [
       "Static A* is dominated on every metric by every replanning method.",
-      "5× longer TTF and 2.5× higher score with no algorithmic change beyond \"rerun every step\"."
+      "5× longer TTF and ~2× higher score with no algorithmic change beyond \"rerun every step\"."
     ],
     {
       x: 0.7,
@@ -1164,7 +1164,7 @@ function addConclusionsSlide() {
     slide,
     "3. Q-learning is competitive and more cautious",
     [
-      "~6× less hazard exposure for ~2× less score vs replanning.",
+      "~6–12× less hazard exposure for ~½ the score vs replanning.",
       "Death policy is a tunable cautiousness knob (model 1 ≫ model 2 ≫ model 3 in score)."
     ],
     {
