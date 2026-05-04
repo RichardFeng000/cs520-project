@@ -23,9 +23,16 @@ RESULTS_DIR = REPO_ROOT / "Agents" / "eval" / "results"
 FIGURES_DIR = REPO_ROOT / "notebooks" / "figures"
 FIGURES_DIR.mkdir(parents=True, exist_ok=True)
 
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
+from Agents.eval.agents import death_policy_for  # noqa: E402
+
 N_EPISODES = int(os.environ.get("MC_N_EPISODES", "50"))
 BASE_SEED = int(os.environ.get("MC_BASE_SEED", "1000"))
-DEATH_POLICY = os.environ.get("MC_DEATH_POLICY", "model2")
+# Optional override; when unset, the policy is resolved per-agent so the
+# cache filenames match the notebook's per-agent eval.
+DEATH_POLICY_OVERRIDE = os.environ.get("MC_DEATH_POLICY") or None
 
 MAIN_AGENTS = [
     "random",
@@ -61,7 +68,8 @@ PALETTE = {
 
 
 def csv_path(agent: str) -> Path:
-    return RESULTS_DIR / f"{agent}__n{N_EPISODES}_seed{BASE_SEED}_{DEATH_POLICY}.csv"
+    policy = DEATH_POLICY_OVERRIDE or death_policy_for(agent)
+    return RESULTS_DIR / f"{agent}__n{N_EPISODES}_seed{BASE_SEED}_{policy}.csv"
 
 
 def load_all() -> pd.DataFrame:

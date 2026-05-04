@@ -31,6 +31,23 @@ QTABLE_PATHS: Dict[str, Path] = {
     "qlearning_model3": REPO_ROOT / "RL" / "models" / "rl_model3_q_table.json",
 }
 
+# Each Q-learning agent is evaluated under the same env death policy it was
+# trained with, so its learned action-values match the score landscape it sees
+# at eval time. Non-RL agents (A*, heuristic, random) don't read ``env.score``
+# at runtime, so they all run under "model1" (no score reset on death) — a
+# neutral baseline that leaves their behaviour and ``peak_score`` unchanged.
+AGENT_DEATH_POLICIES: Dict[str, str] = {
+    "qlearning_model1": "model1",
+    "qlearning_model2": "model2",
+    "qlearning_model3": "model3",
+}
+DEFAULT_DEATH_POLICY = "model1"
+
+
+def death_policy_for(agent_name: str) -> str:
+    """Return the env death policy that should be used to evaluate ``agent_name``."""
+    return AGENT_DEATH_POLICIES.get(agent_name, DEFAULT_DEATH_POLICY)
+
 
 def _wrap_observation_agent(select_fn: Callable[[Dict[str, Any]], str]) -> AgentCallable:
     def runner(env: HighScorePacmanEnv) -> str:
@@ -126,4 +143,13 @@ def build_agent(name: str) -> AgentCallable:
     return AGENT_FACTORIES[name]()
 
 
-__all__ = ["AGENT_FACTORIES", "AgentCallable", "AgentFactory", "build_agent", "list_agents"]
+__all__ = [
+    "AGENT_DEATH_POLICIES",
+    "AGENT_FACTORIES",
+    "AgentCallable",
+    "AgentFactory",
+    "DEFAULT_DEATH_POLICY",
+    "build_agent",
+    "death_policy_for",
+    "list_agents",
+]

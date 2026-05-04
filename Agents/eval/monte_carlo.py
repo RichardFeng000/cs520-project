@@ -13,7 +13,13 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Callable, Dict, Iterable, List, Optional, Sequence
 
-from .agents import AGENT_FACTORIES, AgentCallable, AgentFactory, build_agent
+from .agents import (
+    AGENT_FACTORIES,
+    AgentCallable,
+    AgentFactory,
+    build_agent,
+    death_policy_for,
+)
 from .env_adapter import HighScorePacmanEnv, hazard_pressure, make_env
 
 DEFAULT_MAX_STEPS = 900
@@ -147,20 +153,27 @@ def run_many(
     agent_name: str,
     n_episodes: int,
     base_seed: int = 1000,
-    death_policy: str = "model2",
+    death_policy: Optional[str] = None,
     level: int = 1,
     max_steps: int = DEFAULT_MAX_STEPS,
     progress: Optional[Callable[[str], None]] = None,
     factory_override: Optional[AgentFactory] = None,
 ) -> RunSummary:
-    """Run ``n_episodes`` of ``agent_name`` and return a summary + raw rows."""
+    """Run ``n_episodes`` of ``agent_name`` and return a summary + raw rows.
+
+    When ``death_policy`` is ``None`` (the default) the env death policy is
+    resolved per-agent via :func:`death_policy_for` — Q-learning agents run
+    under the policy they were trained with, and non-RL agents fall back to
+    a neutral default.
+    """
     factory = factory_override or AGENT_FACTORIES[agent_name]
+    resolved_policy = death_policy if death_policy is not None else death_policy_for(agent_name)
     rows: List[EpisodeResult] = []
     started = time.time()
 
     for ep in range(n_episodes):
         seed = base_seed + ep
-        env = make_env(seed=seed, death_policy=death_policy, level=level)
+        env = make_env(seed=seed, death_policy=resolved_policy, level=level)
         agent_fn = factory()
         ep_started = time.time()
         metrics = run_episode(env, agent_fn, max_steps=max_steps)
@@ -186,7 +199,7 @@ def run_all(
     agent_names: Iterable[str],
     n_episodes: int,
     base_seed: int = 1000,
-    death_policy: str = "model2",
+    death_policy: Optional[str] = None,
     progress: Optional[Callable[[str], None]] = None,
 ) -> Dict[str, RunSummary]:
     out: Dict[str, RunSummary] = {}
