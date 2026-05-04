@@ -587,6 +587,13 @@ class QLearner:
             target += self.gamma * max(next_values[action_name] for action_name in next_legal_actions)
         state_values[action] += self.alpha * (target - state_values[action])
 
+    @staticmethod
+    def _write_text_atomic(path: Path, content: str) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp_path = path.with_name(path.name + ".tmp")
+        tmp_path.write_text(content, encoding="utf-8")
+        tmp_path.replace(path)
+
     def export_json(self, path: Path, level: int, stats: Dict[str, float]) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
         payload = {
@@ -598,7 +605,7 @@ class QLearner:
             "stats": stats,
             "q_table": self.q,
         }
-        path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
+        self._write_text_atomic(path, json.dumps(payload, indent=2, sort_keys=True))
 
     def export_js(self, path: Path, level: int, stats: Dict[str, float]) -> None:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -611,9 +618,9 @@ class QLearner:
             "stats": stats,
             "q_table": self.q,
         }
-        path.write_text(
+        self._write_text_atomic(
+            path,
             "window.__PACMAN_RL_MODEL__ = " + json.dumps(payload, sort_keys=True) + ";\n",
-            encoding="utf-8",
         )
 
 
@@ -667,6 +674,9 @@ def train(
     level: int,
     eval_episodes: int,
     death_policy: str,
+    checkpoint_interval: int,
+    checkpoint_json_path: Optional[Path],
+    checkpoint_js_path: Optional[Path],
 ) -> Tuple[QLearner, Dict[str, float]]:
     random.seed(seed)
     env = HighScorePacmanEnv(level=level, seed=seed, death_policy=death_policy)
@@ -678,6 +688,20 @@ def train(
             best_score = score
         if episode and episode % max(1, episodes // 5) == 0:
             learner.epsilon *= 0.92
+        completed_episodes = episode + 1
+        if checkpoint_interval > 0 and completed_episodes % checkpoint_interval == 0:
+            checkpoint_stats = {
+                "best_training_score": float(best_score),
+                "checkpoint_episode": float(completed_episodes),
+                "death_policy": death_policy,
+                "episodes": float(completed_episodes),
+                "target_episodes": float(episodes),
+            }
+            if checkpoint_json_path is not None:
+                learner.export_json(checkpoint_json_path, level=level, stats=checkpoint_stats)
+            if checkpoint_js_path is not None:
+                learner.export_js(checkpoint_js_path, level=level, stats=checkpoint_stats)
+            print(f"checkpoint saved at episode {completed_episodes}/{episodes}", flush=True)
     stats = evaluate(env, learner, eval_episodes)
     stats["best_training_score"] = float(best_score)
     stats["death_policy"] = death_policy
@@ -697,7 +721,16 @@ def main() -> None:
     parser.add_argument("--death-policy", choices=("model1", "model2", "model3"), default="model2")
     parser.add_argument("--output", default="RL/rl_q_table.json")
     parser.add_argument("--js-output", default="RL/rl_model.generated.js")
+    parser.add_argument(
+        "--checkpoint-interval",
+        type=int,
+        default=0,
+        help="Save output files every N training episodes. Disabled when 0.",
+    )
     args = parser.parse_args()
+
+    json_path = Path(args.output)
+    js_path = Path(args.js_output)
 
     learner, stats = train(
         episodes=args.episodes,
@@ -708,10 +741,11 @@ def main() -> None:
         level=args.level,
         eval_episodes=args.eval_episodes,
         death_policy=args.death_policy,
+        checkpoint_interval=args.checkpoint_interval,
+        checkpoint_json_path=json_path,
+        checkpoint_js_path=js_path,
     )
 
-    json_path = Path(args.output)
-    js_path = Path(args.js_output)
     learner.export_json(json_path, level=args.level, stats=stats)
     learner.export_js(js_path, level=args.level, stats=stats)
 
