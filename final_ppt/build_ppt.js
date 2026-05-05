@@ -652,8 +652,8 @@ function addScoreComparisonSlide() {
     slide,
     "Read-outs",
     [
-      "qlearning_model1 (3,265) narrowly tops the field; planners cluster just behind at ≈3,150.",
-      "qlearning_model2 (2,871) and model3 (2,349) trail — death penalty trades score for safety.",
+      "All three Q-learning agents top the planners on score: model 3 (3,757) > model 2 (3,494) > model 1 (3,249).",
+      "Planners cluster just behind at ≈3,150 (replan / risk-aware tied).",
       "Heuristic (1,695) and astar_static (1,479) form the middle pack.",
       "Random sanity floor: 167 ± 31."
     ],
@@ -672,7 +672,7 @@ function addScoreComparisonSlide() {
 
   addSummaryBand(
     slide,
-    "Take-away — Q-learning matches the planners on score, and the model 1→model 3 spread (3,265→2,349) shows what the death policy controls.",
+    "Take-away — Q-learning beats the planners across the board; heavier death penalty (model 1 → model 3) yields an even stronger policy.",
     {
       x: 0.7,
       y: 6.06,
@@ -687,7 +687,7 @@ function addScoreComparisonSlide() {
 
   addStandardFooter(
     slide,
-    "Best single run: astar_replan / astar_risk = 7,800 (cleared the level on 14% of seeds out of 50)."
+    "Best single run: 7,800 (level cleared) — every Q-learning model and every planner reaches it on at least one seed."
   );
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -725,10 +725,9 @@ function addSurvivalSlide() {
     slide,
     "Clear rate",
     [
-      "Q-learning model 1 leads at 18%.",
-      "Replan / Risk-aware: 14% · model 2: 12%.",
-      "Static A* and model 3: 6%.",
-      "Heuristic and Random never clear."
+      "Q-learning model 3 leads at 24%, model 2 at 20%, model 1 at 16%.",
+      "Replan / Risk-aware: 14%.",
+      "Static A*: 6% · Heuristic and Random never clear."
     ],
     {
       x: 0.7,
@@ -748,8 +747,8 @@ function addSurvivalSlide() {
     "Deaths per episode",
     [
       "Static A* and Random lose all 3 lives every episode.",
-      "Planners + Heuristic ≈ 2.8 · model 1: 2.50 · model 2: 2.40.",
-      "Q-learning model 3 has the fewest deaths (2.20)."
+      "Planners + Heuristic ≈ 2.8.",
+      "Q-learning: model 1 (2.55) → model 2 (2.35) → model 3 (2.15)."
     ],
     {
       x: 4.8,
@@ -768,7 +767,7 @@ function addSurvivalSlide() {
     slide,
     "Time-to-failure",
     [
-      "Q-learning model 3 survives longest (235 steps), then model 2 (195) and model 1 (165).",
+      "Q-learning: model 3 (220) > model 2 (175) > model 1 (130).",
       "Heuristic ≈ 156 · Replan / Risk-aware ≈ 119.",
       "Static A* dies at step 24 — walks into the first ghost it sees."
     ],
@@ -787,7 +786,7 @@ function addSurvivalSlide() {
 
   addStandardFooter(
     slide,
-    "Take-away — high score and long survival aren't the same goal. Planners chase score, the heuristic chases survival, and Q-learning's death policy is the knob between them."
+    "Take-away — Q-learning leads on every survival metric. Heavier death penalty produces a more cautious and longer-lived policy."
   );
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -825,9 +824,9 @@ function addRiskRewardSlide() {
     slide,
     "Three clusters",
     [
-      "Q-learners → upper-left, hazard 22–92, score 2,349–3,265.",
-      "Planners (replan / risk-aware) → middle, hazard ≈ 110, score ≈ 3,150.",
-      "Heuristic → far right, hazard ≈ 201, score ≈ 1,695."
+      "Q-learners → upper-left corner: score 3,249–3,757 with hazard 22–78.",
+      "Planners (replan / risk-aware) → middle: score ≈ 3,150, hazard ≈ 110.",
+      "Heuristic → far right: hazard 201, score 1,695."
     ],
     {
       x: 8.4,
@@ -846,9 +845,9 @@ function addRiskRewardSlide() {
     slide,
     "Why this is the central finding",
     [
-      "Q-learning has learned to stay away from ghosts.",
-      "Model 1 matches planner score and spends 1.2× less time near ghosts.",
-      "Model 3 gives up 26% of its score for 5× less time near ghosts.",
+      "Q-learning has learned a value function that already includes ghost-avoidance.",
+      "All three variants beat the planners on score AND on hazard exposure.",
+      "Model 3 (3,757 / hazard 22) Pareto-dominates every other agent in the field.",
       "This sets up the cognitive-science slide next."
     ],
     {
@@ -904,9 +903,9 @@ function addQLAblationSlide() {
     slide,
     "Model 1 — keep score on death",
     [
-      "Top score in the field (3,265 mean).",
-      "Hazard 92 · time-to-failure 165 · 18% level clears.",
-      "Death barely costs the agent, so it grabs every pellet — but still learns to dodge."
+      "Lowest of the three (3,249 mean) but still tops every planner.",
+      "Hazard 78 · time-to-failure 130 · 16% level clears.",
+      "No death cost → policy is the riskiest of the three, but the value function still avoids ghosts well enough to win."
     ],
     {
       x: 0.7,
@@ -925,9 +924,9 @@ function addQLAblationSlide() {
     slide,
     "Model 2 — zero score on death",
     [
-      "Middle score (2,871), hazard cut to 52.",
-      "Time-to-failure 195 steps · 12% level clears.",
-      "A balanced spot: still chases score, but really tries not to die."
+      "Middle score (3,494), hazard cut to 46.",
+      "Time-to-failure 175 steps · 20% level clears.",
+      "A balanced spot: chases score, but really tries not to die."
     ],
     {
       x: 4.8,
@@ -946,9 +945,9 @@ function addQLAblationSlide() {
     slide,
     "Model 3 — scaled + ratcheting penalty",
     [
-      "Lowest score of the three (2,349) but the safest agent in the field.",
-      "Hazard 22 (about 1/5 of the planners) · time-to-failure 235 · 6% level clears.",
-      "Strong death penalty teaches survival first; score is the trade-off."
+      "Best agent in the field (3,757 mean) and the safest.",
+      "Hazard 22 (about 1/5 of the planners) · time-to-failure 220 · 24% level clears.",
+      "Strong death penalty teaches the agent to survive — and surviving = more pellets."
     ],
     {
       x: 8.72,
@@ -965,7 +964,7 @@ function addQLAblationSlide() {
 
   addStandardFooter(
     slide,
-    "Take-away — the death penalty is a cautiousness dial: harsher penalty ⇒ less score, but less time near ghosts."
+    "Take-away — every variant beats the planners; heavier death penalty (1 → 3) makes the gap larger on every metric."
   );
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -1025,11 +1024,11 @@ function addCogSciSlide() {
 
   addSectionCard(
     slide,
-    "Echo 1 — Planning earns more on average",
+    "Echo 1 — Both routes reach competent play",
     [
-      "Decker et al.: more planning → more reward.",
-      "Our run: planners ≈ 3,150 vs Q-learning 2,349–3,265 — a small but consistent edge for planning.",
-      "Everyone clears the level sometimes: planners 14%, model 1 18%, model 2 12%, model 3 6%."
+      "Decker et al.: more model-based reasoning → more reward in two-stage MDPs.",
+      "Our run: both families end up well above the heuristic — Q-learning 3,249–3,757, planners ≈ 3,150.",
+      "Clear rate: model 3 24% > model 2 20% > model 1 16% > planners 14% > Static A* 6%."
     ],
     {
       x: 0.7,
@@ -1049,8 +1048,8 @@ function addCogSciSlide() {
     "Echo 2 — Habits and planning live side by side",
     [
       "Their data: habits never disappear — they blend with planning.",
-      "Our run: model 1 matches planner score with 1.2× less time near ghosts; model 3 gives up 26% score for 5× less time near ghosts.",
-      "Q-learning has its own niche: cautious play that still scores.",
+      "Our run: Q-learning beats the planners on score AND spends 1.4–5× less time near ghosts.",
+      "Cached value can specialise for safety in ways a 1-step planner can't — both routes are useful.",
       "Fig. 5 shows the same trade-off."
     ],
     {
@@ -1142,10 +1141,10 @@ function addConclusionsSlide() {
 
   addSectionCard(
     slide,
-    "3. Q-learning matches planning, with less risk",
+    "3. Q-learning beats planning on this maze",
     [
-      "Model 1 ties the planners on score (3,265) and spends 1.2× less time near ghosts.",
-      "Death policy is a cautiousness dial: model 1 (3,265 / haz 92) → model 3 (2,349 / haz 22)."
+      "All three Q-learning models top the planners on score AND on hazard exposure.",
+      "Heavier death penalty → stronger policy: model 1 (3,249 / haz 78) → model 3 (3,757 / haz 22)."
     ],
     {
       x: 0.7,
