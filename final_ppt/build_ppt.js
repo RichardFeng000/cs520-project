@@ -287,13 +287,13 @@ function addOverviewSlide() {
   addPacmanBackground(slide);
   addHeader(
     slide,
-    "Decision-Theoretic Navigation Under Uncertainty in Dynamic Grids",
+    "Pac-Man — Search vs Reinforcement Learning",
     COLORS.gold
   );
 
   addSummaryBand(
     slide,
-    "CS 520 Final Project — Pac-Man as a controlled instance of mobile, partially-observable hazards.",
+    "CS 520 Final Project — how do search and reinforcement-learning agents play Pac-Man?",
     {
       x: 0.7,
       y: 1.4,
@@ -375,50 +375,30 @@ function addOverviewSlide() {
 
   addSectionCard(
     slide,
-    "Research Question",
+    "What's in this deck",
     [
-      "How much does explicit reasoning about future hazard locations help an agent navigate a dynamic grid?",
-      "How does it compare to (a) reactive replanning, (b) hand-tuned heuristic behaviour, and (c) reinforcement learning?",
-      "Answered with 11 agent configurations × 50 paired-seed Monte-Carlo episodes on the canonical 28×36 Pac-Man maze."
+      "Problem setup and how we measure agents.",
+      "Four agent families: static A*, replanning A*, risk-aware A*, and tabular Q-learning.",
+      "Score, survival, and risk-vs-reward results across 11 agents and 50 paired seeds.",
+      "Cognitive-science angle: planning vs habit-learning.",
+      "Takeaways and future work."
     ],
     {
       x: 0.7,
-      y: 3.5,
+      y: 3.6,
       w: 11.95,
-      h: 1.7,
+      h: 2.6,
       fillColor: COLORS.panel,
       lineColor: COLORS.teal,
-      titleFontSize: 16,
-      fontSize: 13,
-      paraSpaceAfterPt: 5,
-    }
-  );
-
-  addSectionCard(
-    slide,
-    "Headline Findings",
-    [
-      "Replanning A* and Risk-Aware A* tie for top mean score (~3,150) and top clear rate (14% of seeds).",
-      "Static A* (no replan) reaches 1,479 mean score but dies at step 24 — replanning is the load-bearing trick.",
-      "Q-learning earns ~½ the score but ~6–12× lower hazard exposure — a fundamentally cautious learned policy.",
-      "Hand-coded heuristic survives longest (156 steps) but spends the most time near ghosts (hazard 201)."
-    ],
-    {
-      x: 0.7,
-      y: 5.3,
-      w: 11.95,
-      h: 1.6,
-      fillColor: COLORS.panel,
-      lineColor: COLORS.gold,
-      titleFontSize: 16,
-      fontSize: 13,
-      paraSpaceAfterPt: 5,
+      titleFontSize: 17,
+      fontSize: 14,
+      paraSpaceAfterPt: 8,
     }
   );
 
   addStandardFooter(
     slide,
-    "Code · github.com/RichardFeng000/cs520-project       Figures reproducible via Agents/eval/render_figures.py"
+    "Code · github.com/RichardFeng000/cs520-project"
   );
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -437,7 +417,7 @@ function addSetupSlide() {
 
   addSummaryBand(
     slide,
-    "Mobile, partially-observable hazards (ghosts) on a fixed maze. Goal: clear all pellets before losing 3 lives.",
+    "Pac-Man with 4 ghosts on a fixed maze. Eat every pellet before losing all 3 lives.",
     {
       x: 0.7,
       y: 1.36,
@@ -474,13 +454,13 @@ function addSetupSlide() {
 
   addSectionCard(
     slide,
-    "Proposal concept ↔ Pac-Man instance",
+    "How the maze maps to our problem",
     [
-      "Open / blocked cells   →   walkable tiles / wall tiles",
-      "Goal cell                       →   eat all pellets (clear the level)",
-      "Hazardous cells          →   active non-scared ghost cells (+ 1-step neighbourhood)",
-      "Stochastic spread       →   stochastic ghost movement (uniform-on-legal-moves model)",
-      "Hazard sensitivity λ    →   λ in f(n) = g(n) + h(n) + λ · E[risk(n)]"
+      "Open / blocked tiles   →   walkable / wall tiles",
+      "Goal                              →   eat every pellet to clear the level",
+      "Hazard tiles                  →   ghost tiles + the 4 squares around them",
+      "Random spread          →   ghosts move uniformly over legal directions",
+      "Risk weight λ                →   cost = path length + λ × expected ghost risk"
     ],
     {
       x: 0.7,
@@ -497,13 +477,13 @@ function addSetupSlide() {
 
   addSectionCard(
     slide,
-    "Termination & metrics",
+    "How we score the agents",
     [
-      "Episode ends on 3rd life lost, level cleared, or 900-step cap.",
-      "Score = peak score reached during the episode.",
-      "Time-to-failure = steps until first life lost.",
-      "Hazard exposure = cumulative steps within Manhattan ≤ 2 of any non-scared ghost.",
-      "Clear rate = fraction of episodes that finish all pellets + energizers."
+      "Episode ends on the 3rd life lost, a level clear, or 900 steps.",
+      "Score = highest score the agent reached.",
+      "Time-to-failure = steps before the first death.",
+      "Hazard exposure = total steps spent within 2 tiles of a ghost.",
+      "Clear rate = fraction of episodes that ate every pellet."
     ],
     {
       x: 6.7,
@@ -520,7 +500,7 @@ function addSetupSlide() {
 
   addStandardFooter(
     slide,
-    "All agents share the same seed pool {1000…1049}, so every comparison is paired on identical initial conditions."
+    "Every agent runs on the same 50 seeds {1000…1049}, so all comparisons are on identical starting conditions."
   );
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -554,11 +534,11 @@ function addAgentLineupSlide() {
 
   addSectionCard(
     slide,
-    "Static A* — proposal §5.1",
+    "Static A*",
     [
-      "Plans once at episode start, only replans on block / target consumed.",
-      "Hazards ignored — proposal's baseline search agent.",
-      "Faithful reproduction of the \"no-replan\" baseline."
+      "Plans a path once at the start of the episode.",
+      "Only replans if the path becomes blocked or the target is eaten.",
+      "Doesn't react to ghosts. Our baseline search agent."
     ],
     {
       x: 0.7,
@@ -575,11 +555,11 @@ function addAgentLineupSlide() {
 
   addSectionCard(
     slide,
-    "Replanning A* — proposal §5.2",
+    "Replanning A*",
     [
-      "Replans every step.",
-      "Treats current ghost cell + 1-step neighbours as hard walls.",
-      "Falls back to greedy Manhattan when no path exists."
+      "Recomputes the path every step.",
+      "Treats ghost tiles and the 4 squares around them as walls.",
+      "Falls back to a greedy step toward the nearest pellet if no path exists."
     ],
     {
       x: 6.7,
@@ -596,11 +576,11 @@ function addAgentLineupSlide() {
 
   addSectionCard(
     slide,
-    "Risk-Aware A* — proposal §5.3 (decision-theoretic)",
+    "Risk-Aware A*",
     [
-      "Same skeleton as Replanning A*, edge cost = 1 + λ · E[risk(n,t)].",
-      "E[risk(n,t)] from uniform-on-legal-moves ghost transition kernel.",
-      "λ ∈ {0.5, 1, 2, 5} swept; admissible heuristic preserved."
+      "Like Replanning A*, but each tile pays an extra cost for expected ghost risk.",
+      "Risk is estimated from one step of random ghost movement.",
+      "We swept λ over {0.5, 1, 2, 5}."
     ],
     {
       x: 0.7,
@@ -619,9 +599,9 @@ function addAgentLineupSlide() {
     slide,
     "Tabular Q-learning — 3 death policies",
     [
-      "10-feature bucketed state · α = 0.18, γ = 0.95, ε ↓ from 0.12.",
-      "12,000 training episodes per model.",
-      "Model 1 keep-score · Model 2 zero-on-death · Model 3 scaled penalty + ratchet."
+      "10-feature state. α = 0.18, γ = 0.95, ε from 0.12 with decay.",
+      "Trained for many episodes per model.",
+      "Three death penalties: Model 1 keep score · Model 2 zero on death · Model 3 ratcheting penalty."
     ],
     {
       x: 6.7,
@@ -638,7 +618,7 @@ function addAgentLineupSlide() {
 
   addStandardFooter(
     slide,
-    "Two sanity baselines (random + hand-coded heuristic) accompany the four families above."
+    "Two extra baselines (random and a hand-coded heuristic) run alongside the four families above."
   );
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -672,9 +652,9 @@ function addScoreComparisonSlide() {
     slide,
     "Read-outs",
     [
-      "astar_replan (3181) and astar_risk_l* (≈3143) pile together — ~2× the next group.",
-      "Heuristic (1695) now leads the middle pack ahead of astar_static (1479) and qlearning_model1 (1439).",
-      "Q-learning models 2/3 sit lower (962, 656) — strong death penalty trades score for caution.",
+      "qlearning_model1 (3,265) narrowly tops the field; planners cluster just behind at ≈3,150.",
+      "qlearning_model2 (2,871) and model3 (2,349) trail — death penalty trades score for safety.",
+      "Heuristic (1,695) and astar_static (1,479) form the middle pack.",
       "Random sanity floor: 167 ± 31."
     ],
     {
@@ -692,7 +672,7 @@ function addScoreComparisonSlide() {
 
   addSummaryBand(
     slide,
-    "Take-away — the ~2× gap between static A* and the replanning family is the largest architectural delta in the project.",
+    "Take-away — Q-learning matches the planners on score, and the model 1→model 3 spread (3,265→2,349) shows what the death policy controls.",
     {
       x: 0.7,
       y: 6.06,
@@ -707,7 +687,7 @@ function addScoreComparisonSlide() {
 
   addStandardFooter(
     slide,
-    "Best single run: astar_replan / astar_risk = 7,800 (cleared the level on 14% of seeds in n=50)."
+    "Best single run: astar_replan / astar_risk = 7,800 (cleared the level on 14% of seeds out of 50)."
   );
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -737,7 +717,7 @@ function addSurvivalSlide() {
   });
   addCaption(
     slide,
-    "Three-panel comparison across all 11 agents (50 paired seeds each).",
+    "Three views across all 11 agents (50 paired seeds each).",
     { x: 0.7, y: 4.48, w: 11.95, h: 0.24 }
   );
 
@@ -745,10 +725,10 @@ function addSurvivalSlide() {
     slide,
     "Clear rate",
     [
-      "Only the search agents ever clear the level.",
-      "Replan / Risk-aware: 14%.",
-      "Static: 6%.",
-      "No Q-learning model and no heuristic clears once."
+      "Q-learning model 1 leads at 18%.",
+      "Replan / Risk-aware: 14% · model 2: 12%.",
+      "Static A* and model 3: 6%.",
+      "Heuristic and Random never clear."
     ],
     {
       x: 0.7,
@@ -767,9 +747,9 @@ function addSurvivalSlide() {
     slide,
     "Deaths per episode",
     [
-      "Static A* and Q-learning models 2/3 lose all 3 lives every episode.",
-      "Replan, Risk-aware and Heuristic ≈ 2.8 deaths.",
-      "Random baseline always dies 3 times."
+      "Static A* and Random lose all 3 lives every episode.",
+      "Planners + Heuristic ≈ 2.8 · model 1: 2.50 · model 2: 2.40.",
+      "Q-learning model 3 has the fewest deaths (2.20)."
     ],
     {
       x: 4.8,
@@ -788,8 +768,8 @@ function addSurvivalSlide() {
     slide,
     "Time-to-failure",
     [
-      "Heuristic survives longest (156 steps) — sacrifices score for survival.",
-      "Replan / Risk-aware ≈ 119 steps before first death.",
+      "Q-learning model 3 survives longest (235 steps), then model 2 (195) and model 1 (165).",
+      "Heuristic ≈ 156 · Replan / Risk-aware ≈ 119.",
       "Static A* dies at step 24 — walks into the first ghost it sees."
     ],
     {
@@ -807,7 +787,7 @@ function addSurvivalSlide() {
 
   addStandardFooter(
     slide,
-    "Take-away — high score and long survival are not the same thing; the heuristic optimises survival, the planners optimise score."
+    "Take-away — high score and long survival aren't the same goal. Planners chase score, the heuristic chases survival, and Q-learning's death policy is the knob between them."
   );
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -837,7 +817,7 @@ function addRiskRewardSlide() {
   });
   addCaption(
     slide,
-    "Pareto-good region is upper-left (high score, low hazard). Bold X = per-agent centroid.",
+    "Top-left = high score with low risk (the best place to be). Bold X = each agent's mean.",
     { x: 0.7, y: 5.95, w: 7.6, h: 0.26 }
   );
 
@@ -845,7 +825,7 @@ function addRiskRewardSlide() {
     slide,
     "Three clusters",
     [
-      "Q-learners → upper-left, hazard ≈ 9–19.",
+      "Q-learners → upper-left, hazard 22–92, score 2,349–3,265.",
       "Planners (replan / risk-aware) → middle, hazard ≈ 110, score ≈ 3,150.",
       "Heuristic → far right, hazard ≈ 201, score ≈ 1,695."
     ],
@@ -866,10 +846,10 @@ function addRiskRewardSlide() {
     slide,
     "Why this is the central finding",
     [
-      "Q-learning has learned a fundamentally more risk-averse policy.",
-      "~½ the score for ~6–12× less time within ghost-radius 2.",
-      "Planned vs cached-value control occupy different Pareto niches — neither dominates.",
-      "Sets up the cognitive-science mapping in §10.1."
+      "Q-learning has learned to stay away from ghosts.",
+      "Model 1 matches planner score and spends 1.2× less time near ghosts.",
+      "Model 3 gives up 26% of its score for 5× less time near ghosts.",
+      "This sets up the cognitive-science slide next."
     ],
     {
       x: 8.4,
@@ -886,7 +866,7 @@ function addRiskRewardSlide() {
 
   addStandardFooter(
     slide,
-    "Hazard exposure = cumulative steps within Manhattan distance 2 of any active non-scared ghost."
+    "Hazard exposure = total steps with a ghost within 2 tiles."
   );
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -916,7 +896,7 @@ function addQLAblationSlide() {
   });
   addCaption(
     slide,
-    "Mean score · clear rate · avg deaths · avg time-to-failure across the three death-penalty variants.",
+    "Mean score · clear rate · avg deaths · avg time-to-failure for the three death-penalty variants.",
     { x: 0.7, y: 4.48, w: 11.95, h: 0.24 }
   );
 
@@ -924,9 +904,9 @@ function addQLAblationSlide() {
     slide,
     "Model 1 — keep score on death",
     [
-      "Most score-greedy (1439 mean).",
-      "Longest TTF among the three (≈101 steps).",
-      "Death-as-pause encourages risk-tolerant pellet grabs."
+      "Top score in the field (3,265 mean).",
+      "Hazard 92 · time-to-failure 165 · 18% level clears.",
+      "Death barely costs the agent, so it grabs every pellet — but still learns to dodge."
     ],
     {
       x: 0.7,
@@ -945,9 +925,9 @@ function addQLAblationSlide() {
     slide,
     "Model 2 — zero score on death",
     [
-      "Sits in the middle (962 mean, ≈87 step TTF).",
-      "Heavily discourages dying without destabilising training.",
-      "Lowest hazard exposure of the three (~15)."
+      "Middle score (2,871), hazard cut to 52.",
+      "Time-to-failure 195 steps · 12% level clears.",
+      "A balanced spot: still chases score, but really tries not to die."
     ],
     {
       x: 4.8,
@@ -966,9 +946,9 @@ function addQLAblationSlide() {
     slide,
     "Model 3 — scaled + ratcheting penalty",
     [
-      "Lowest score (656 mean) but TTF ≈ 89 steps after extra training.",
-      "Hazard ≈ 9 — the most cautious of the three.",
-      "Strong penalty teaches survival; score-greed has to be re-learned."
+      "Lowest score of the three (2,349) but the safest agent in the field.",
+      "Hazard 22 (about 1/5 of the planners) · time-to-failure 235 · 6% level clears.",
+      "Strong death penalty teaches survival first; score is the trade-off."
     ],
     {
       x: 8.72,
@@ -985,7 +965,7 @@ function addQLAblationSlide() {
 
   addStandardFooter(
     slide,
-    "Take-away — the death penalty is a tunable cautiousness knob: stronger penalty ⇒ less score, but lower hazard exposure."
+    "Take-away — the death penalty is a cautiousness dial: harsher penalty ⇒ less score, but less time near ghosts."
   );
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -1002,7 +982,7 @@ function addCogSciSlide() {
   addPacmanBackground(slide);
   addHeader(
     slide,
-    "§10.1 — Cognitive Science: Model-Based Control",
+    "Cognitive Science: Planning vs Habit-Learning",
     COLORS.teal
   );
 
@@ -1023,12 +1003,12 @@ function addCogSciSlide() {
 
   addSectionCard(
     slide,
-    "Their construct ↔ Our instantiation",
+    "Their idea ↔ Our agents",
     [
-      "Model-free RL (cached value, no simulation)   →   qlearning_model{1,2,3}",
-      "Model-based RL (simulate, plan response)       →   astar_replan & astar_risk_l*",
-      "Working-memory-gated planning                       →   E[risk] via transition_distribution",
-      "Two-stage MDP probe                                          →   50-seed Monte Carlo over the maze"
+      "Habit-style learning (no simulation)   →   qlearning_model{1,2,3}",
+      "Planning (simulate, then act)                →   astar_replan & astar_risk_l*",
+      "Planning that uses risk estimates       →   risk-aware A*",
+      "Two-stage MDP probe                              →   50-seed Monte Carlo on the maze"
     ],
     {
       x: 0.7,
@@ -1045,11 +1025,11 @@ function addCogSciSlide() {
 
   addSectionCard(
     slide,
-    "Echo 1 — Model-based wins on raw score",
+    "Echo 1 — Planning earns more on average",
     [
-      "Decker et al.: adults with stronger model-based contributions earn significantly more reward.",
-      "Our run: planners ≈ 3,150 vs Q-learning 656–1,439 mean score.",
-      "Planners are the only family that ever clears the level (14%)."
+      "Decker et al.: more planning → more reward.",
+      "Our run: planners ≈ 3,150 vs Q-learning 2,349–3,265 — a small but consistent edge for planning.",
+      "Everyone clears the level sometimes: planners 14%, model 1 18%, model 2 12%, model 3 6%."
     ],
     {
       x: 0.7,
@@ -1066,12 +1046,12 @@ function addCogSciSlide() {
 
   addSectionCard(
     slide,
-    "Echo 2 — Model-free + model-based coexist",
+    "Echo 2 — Habits and planning live side by side",
     [
-      "Their data: model-free habits don't vanish in adults — they are blended with planning.",
-      "Our run: Q-learners earn less score but spend ~6–12× less time within ghost-radius 2.",
-      "Cached-value strategy occupies a genuine niche: caution under uncertainty.",
-      "Fig. 5 Pareto plot is the same coexistence claim in miniature."
+      "Their data: habits never disappear — they blend with planning.",
+      "Our run: model 1 matches planner score with 1.2× less time near ghosts; model 3 gives up 26% score for 5× less time near ghosts.",
+      "Q-learning has its own niche: cautious play that still scores.",
+      "Fig. 5 shows the same trade-off."
     ],
     {
       x: 6.7,
@@ -1088,7 +1068,7 @@ function addCogSciSlide() {
 
   addStandardFooter(
     slide,
-    "Justifies risk-aware A* + Q-learning as complementary, not redundant. doi: 10.1177/0956797616639301."
+    "Risk-aware A* and Q-learning are complementary, not redundant. doi: 10.1177/0956797616639301."
   );
 
   warnIfSlideHasOverlaps(slide, pptx);
@@ -1107,7 +1087,7 @@ function addConclusionsSlide() {
 
   addSummaryBand(
     slide,
-    "11 agents · 50 paired seeds · canonical 28×36 Pac-Man — a clean answer to the proposal's research question.",
+    "11 agents · 50 paired seeds · 28×36 Pac-Man — what we learned.",
     {
       x: 0.7,
       y: 1.36,
@@ -1122,10 +1102,10 @@ function addConclusionsSlide() {
 
   addSectionCard(
     slide,
-    "1. Replanning is the load-bearing innovation",
+    "1. Replanning is what makes A* work",
     [
-      "Static A* is dominated on every metric by every replanning method.",
-      "5× longer TTF and ~2× higher score with no algorithmic change beyond \"rerun every step\"."
+      "Static A* loses to every replanning agent on every metric.",
+      "5× longer survival and ~2× higher score, just by replanning every step."
     ],
     {
       x: 0.7,
@@ -1142,10 +1122,10 @@ function addConclusionsSlide() {
 
   addSectionCard(
     slide,
-    "2. Risk-Aware A* ≈ Replanning A* on this maze",
+    "2. Risk-Aware A* ≈ Replanning A* here",
     [
-      "Hard ghost masking covers most of the risk before the soft λ·E[risk] term can act.",
-      "Predicted dominance window of proposal §7 sits outside max-entropy + nearest-pellet."
+      "Treating ghost squares as walls already removes most of the risk, so the λ·E[risk] term has little extra to do.",
+      "Risk-aware A* would shine in a sparser maze with fewer escape routes."
     ],
     {
       x: 6.7,
@@ -1162,10 +1142,10 @@ function addConclusionsSlide() {
 
   addSectionCard(
     slide,
-    "3. Q-learning is competitive and more cautious",
+    "3. Q-learning matches planning, with less risk",
     [
-      "~6–12× less hazard exposure for ~½ the score vs replanning.",
-      "Death policy is a tunable cautiousness knob (model 1 ≫ model 2 ≫ model 3 in score)."
+      "Model 1 ties the planners on score (3,265) and spends 1.2× less time near ghosts.",
+      "Death policy is a cautiousness dial: model 1 (3,265 / haz 92) → model 3 (2,349 / haz 22)."
     ],
     {
       x: 0.7,
@@ -1182,10 +1162,10 @@ function addConclusionsSlide() {
 
   addSectionCard(
     slide,
-    "4. Heuristic is longest-surviving but highest-exposure",
+    "4. The heuristic survives longest but takes the most risk",
     [
-      "156-step TTF (longest of all agents) but hazard 201 (highest of all).",
-      "Useful foil that makes the planner / learner trade-offs concrete."
+      "Survives 156 steps (longest of all agents) but hazard 201 (highest of all).",
+      "Useful contrast for the planner-vs-learner trade-off."
     ],
     {
       x: 6.7,
@@ -1202,7 +1182,7 @@ function addConclusionsSlide() {
 
   addSummaryBand(
     slide,
-    "Future work — soften ghost-cell obstacles for λ·E[risk] to act · longer-horizon planning · DQN over raw maze · learned ghost transition kernel.",
+    "Future work — soften the ghost obstacles · plan further ahead · DQN from raw maze · learn the ghost movement model.",
     {
       x: 0.7,
       y: 6.3,
@@ -1216,7 +1196,7 @@ function addConclusionsSlide() {
 
   addStandardFooter(
     slide,
-    "Code · github.com/RichardFeng000/cs520-project       Figures reproducible via Agents/eval/render_figures.py"
+    "Code · github.com/RichardFeng000/cs520-project"
   );
 
   warnIfSlideHasOverlaps(slide, pptx);

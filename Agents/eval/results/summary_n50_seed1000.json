@@ -1,4 +1,16 @@
 {
+  "qlearning_model1":{
+    "episodes":50,
+    "score_mean":3264.8,
+    "score_std":1495.6,
+    "score_median":2995.0,
+    "score_max":7800,
+    "clear_rate":0.18,
+    "avg_deaths":2.5,
+    "avg_steps":285.0,
+    "avg_ttf":165.06,
+    "avg_hazard":92.04
+  },
   "astar_replan":{
     "episodes":50,
     "score_mean":3181.2,
@@ -59,6 +71,30 @@
     "avg_ttf":119.44,
     "avg_hazard":109.32
   },
+  "qlearning_model2":{
+    "episodes":50,
+    "score_mean":2871.2,
+    "score_std":1414.98,
+    "score_median":2350.0,
+    "score_max":7800,
+    "clear_rate":0.12,
+    "avg_deaths":2.4,
+    "avg_steps":305.02,
+    "avg_ttf":195.0,
+    "avg_hazard":52.02
+  },
+  "qlearning_model3":{
+    "episodes":50,
+    "score_mean":2349.2,
+    "score_std":1233.11,
+    "score_median":2030.0,
+    "score_max":7800,
+    "clear_rate":0.06,
+    "avg_deaths":2.2,
+    "avg_steps":329.94,
+    "avg_ttf":234.96,
+    "avg_hazard":21.98
+  },
   "heuristic":{
     "episodes":50,
     "score_mean":1694.6,
@@ -82,42 +118,6 @@
     "avg_steps":171.78,
     "avg_ttf":24.42,
     "avg_hazard":5.84
-  },
-  "qlearning_model1":{
-    "episodes":50,
-    "score_mean":1438.6,
-    "score_std":573.25,
-    "score_median":1250.0,
-    "score_max":2930,
-    "clear_rate":0.0,
-    "avg_deaths":3.0,
-    "avg_steps":183.0,
-    "avg_ttf":100.6,
-    "avg_hazard":19.04
-  },
-  "qlearning_model2":{
-    "episodes":50,
-    "score_mean":962.0,
-    "score_std":631.05,
-    "score_median":930.0,
-    "score_max":3350,
-    "clear_rate":0.0,
-    "avg_deaths":3.0,
-    "avg_steps":199.74,
-    "avg_ttf":86.66,
-    "avg_hazard":14.78
-  },
-  "qlearning_model3":{
-    "episodes":50,
-    "score_mean":656.26,
-    "score_std":373.43,
-    "score_median":630.0,
-    "score_max":1860,
-    "clear_rate":0.0,
-    "avg_deaths":3.0,
-    "avg_steps":201.04,
-    "avg_ttf":88.98,
-    "avg_hazard":8.72
   },
   "random":{
     "episodes":50,
