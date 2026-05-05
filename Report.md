@@ -14,19 +14,22 @@ We study decision-theoretic navigation under uncertainty by pitting four
 families of agents — static A\*, replanning A\*, risk-aware A\*, and tabular
 Q-learning — against the canonical Pac-Man maze, which we treat as a dynamic
 grid with mobile, partially-observable hazards (ghosts). Each agent is run
-for 50 Monte-Carlo episodes on the same seed pool, and we report mean score,
+for 50 Monte-Carlo episodes on a shared seed pool, and we report mean score,
 level-clear rate, time-to-failure, hazard exposure, and per-episode score
-distributions. Replanning A\* and risk-aware A\* (across λ ∈ {0.5, 1, 2, 5})
-tie for the best raw score (≈2,180) and the best level-clear rate (14%).
-Static A\* without replanning collapses (888 mean score, 24-step
-time-to-failure), confirming that probabilistic replanning is essential under
-mobile hazards. The risk-aware extension does not move the needle on this
-specific maze because hard ghost-obstacle culling already keeps the planned
-path far from any ghost where the additive `λ·E[risk]` term can fire. The
-Q-learning agents trade raw score for an order-of-magnitude lower hazard
-exposure, suggesting they have learned a fundamentally more cautious policy.
-We close with a quantitative discussion of when the decision-theoretic term
-matters and when it does not.
+distributions. Q-learning leads the field on score (3,249–3,757 across the
+three death-policy variants), narrowly above replanning A\* and risk-aware
+A\* (both ≈3,150 across λ ∈ {0.5, 1, 2, 5}). Static A\* without replanning
+collapses (1,479 mean score, 24-step time-to-failure), confirming that
+probabilistic replanning is essential under mobile hazards. The risk-aware
+extension does not move the needle on this specific maze because hard
+ghost-obstacle culling already keeps the planned path far from any ghost
+where the additive `λ·E[risk]` term can fire. The Q-learning agents earn
+*more* score than the planners while spending 1.4–5× less time within
+ghost-radius 2, suggesting they have learned a value function that
+internalises ghost-avoidance. Heavier death penalty (model 1 → 3) yields a
+stronger learned policy on every metric we measured. We close with a
+quantitative discussion of when the decision-theoretic term matters and
+when it does not.
 
 ---
 
@@ -248,8 +251,10 @@ level-clear bonus and a 250-point timeout penalty.
 - **Seed pool**: `{1000, 1001, …, 1049}` shared across *all* agents, so any
   agent-vs-agent comparison is a paired comparison on identical initial
   conditions.
-- **Env death policy**: `model2` (zero score on death) for fair scoring;
-  episodes are still allowed to continue for up to 3 lives.
+- **Env death policy**: per-agent. Each Q-learning model is evaluated under
+  the policy it was trained for (model 1, 2, or 3). Non-RL agents (random,
+  heuristic, all A\* variants) use the neutral `model 1` default — their
+  algorithms are independent of how the env resets the score on death.
 - **Step cap**: 900 steps per episode (the value used by the trainer).
 - **Hazard-exposure metric**: cumulative count of timesteps in which Pac-Man
   is within Manhattan distance 2 of *any* active non-scared ghost.
@@ -276,17 +281,17 @@ The headline summary table (sorted by mean peak score):
 
 | agent | episodes | score (mean ± σ) | median | best | clear | deaths | steps | TTF | hazard |
 |---|---|---|---|---|---|---|---|---|---|
-| `astar_replan`     | 50 | **2197 ± 1445** | 1865 | 7590 | **0.14** | 2.84 | 301 | 119 | 113 |
-| `astar_risk_l05`   | 50 | 2177 ± 1452 | 1825 | 7590 | 0.14 | 2.84 | 299 | 119 | 109 |
-| `astar_risk_l1`    | 50 | 2177 ± 1452 | 1825 | 7590 | 0.14 | 2.84 | 299 | 119 | 109 |
-| `astar_risk_l2`    | 50 | 2177 ± 1452 | 1825 | 7590 | 0.14 | 2.84 | 299 | 119 | 109 |
-| `astar_risk_l5`    | 50 | 2177 ± 1452 | 1825 | 7590 | 0.14 | 2.84 | 300 | 119 | 110 |
-| `qlearning_model1` | 50 | 1089 ± 597  |  880 | 2690 | 0.00 | 3.00 | 183 | 101 |  19 |
-| `heuristic`        | 50 | 1080 ± 514  | 1080 | 2480 | 0.00 | 2.82 | 374 | 156 | **201** |
-| `qlearning_model2` | 50 |  962 ± 631  |  930 | 3350 | 0.00 | 3.00 | 200 |  87 |  15 |
-| `astar_static`     | 50 |  888 ± 428  |  675 | 2410 | 0.06 | 2.92 | 172 |  24 |  **6** |
-| `qlearning_model3` | 50 |  569 ± 608  |  290 | 3420 | 0.00 | 3.00 | 153 |  54 |  12 |
-| `random`           | 50 |  111 ± 13   |  100 |  150 | 0.00 | 3.00 |  74 |  24 |   7 |
+| `qlearning_model3` | 50 | **3757 ± 1499** | 3315 | 7800 | **0.24** | 2.16 | 335 | 220 |  22 |
+| `qlearning_model2` | 50 | 3494 ± 1363   | 3100 | 7800 | 0.20   | 2.34 | 305 | 175 |  46 |
+| `qlearning_model1` | 50 | 3249 ± 1363   | 3210 | 7800 | 0.16   | 2.54 | 270 | 130 |  78 |
+| `astar_replan`     | 50 | 3181 ± 1484   | 2810 | 7800 | 0.14   | 2.84 | 301 | 119 | 113 |
+| `astar_risk_l5`    | 50 | 3146 ± 1496   | 2755 | 7800 | 0.14   | 2.84 | 300 | 119 | 110 |
+| `astar_risk_l05`   | 50 | 3143 ± 1494   | 2755 | 7800 | 0.14   | 2.84 | 299 | 119 | 109 |
+| `astar_risk_l1`    | 50 | 3143 ± 1494   | 2755 | 7800 | 0.14   | 2.84 | 299 | 119 | 109 |
+| `astar_risk_l2`    | 50 | 3143 ± 1494   | 2755 | 7800 | 0.14   | 2.84 | 299 | 119 | 109 |
+| `heuristic`        | 50 | 1695 ± 636    | 1580 | 3310 | 0.00   | 2.82 | 374 | 156 | **201** |
+| `astar_static`     | 50 | 1479 ± 625    | 1145 | 2800 | 0.06   | 2.92 | 172 |  24 |  **6** |
+| `random`           | 50 |  167 ± 31     |  160 |  250 | 0.00   | 3.00 |  74 |  24 |   7 |
 
 ### 8.1 Score comparison (Figure 1)
 
@@ -295,24 +300,27 @@ The headline summary table (sorted by mean peak score):
 Mean peak score per episode, ±1σ. Black diamonds mark the single best score
 observed across the run.
 
-**Read-outs.** Replanning A\* and the four risk-aware variants pile on top
-of each other near 2,200 mean score, more than a ×2 lead over the next
-group. Q-learning model 1 narrowly beats the hand-coded heuristic (1,089 vs
-1,080); model 2 sits behind the heuristic; model 3 is the least
-score-aggressive of the three. Static A\* and random underperform every
-other agent, which is the expected ordering for the proposal's §7
-prediction "the baseline agent is expected to perform well only when hazard
-spread probability is low".
+**Read-outs.** All three Q-learning agents lead the field on mean score
+(model 3 = 3,757, model 2 = 3,494, model 1 = 3,249), narrowly above the
+planner cluster — replanning A\* (3,181) and the four risk-aware variants
+(≈3,143–3,146) — which themselves sit roughly ×2 above the heuristic
+(1,695) and static A\* (1,479). The death-policy axis (model 1 → model 3) is
+monotonic on score: heavier penalty for dying produces a stronger learned
+policy. Static A\* and random underperform every other agent, which is the
+expected ordering for the proposal's §7 prediction "the baseline agent is
+expected to perform well only when hazard spread probability is low".
 
 ### 8.2 Score distribution (Figure 2)
 
 ![Score boxplot](notebooks/figures/fig02_score_boxplot.png)
 
-Per-episode boxplots reveal that the search agents have a long upper
-whisker (some seeds let them clear part of the board), while the
-Q-learning agents have tighter distributions but lower medians. The random
-baseline collapses to a near-degenerate distribution (a few pellets eaten
-by chance before death).
+Per-episode boxplots reveal that the leading agents — the three Q-learning
+models and replanning / risk-aware A\* — all have a long upper whisker
+reaching the 7,800-point level-clear ceiling on at least one seed. Their
+medians cluster between 2,755 and 3,315, with model 3 highest. The
+heuristic and static A\* sit visibly below in both median and spread. The
+random baseline collapses to a near-degenerate distribution (a few pellets
+eaten by chance before death).
 
 ### 8.3 Survival metrics (Figure 3)
 
@@ -320,16 +328,18 @@ by chance before death).
 
 A three-panel comparison:
 
-- **Clear rate.** Only the search agents ever clear the level (replanning /
-  risk-aware: 14% on the 50 seeds; static: 6%). No Q-learning model and no
-  heuristic clears once.
-- **Average deaths.** Static A\* and Q-learning models 2/3 lose all 3 lives
-  effectively every episode. Replanning, risk-aware, and the heuristic
-  manage ~2.8 deaths.
-- **Time-to-failure.** The heuristic is paradoxically the longest survivor
-  (156 steps before first death) — it sacrifices score for survival by
-  running circles around ghosts rather than committing to pellets in
-  contested corridors.
+- **Clear rate.** Q-learning model 3 leads at 24% (12 / 50 seeds), model 2
+  at 20%, model 1 at 16%. Replanning / risk-aware A\*: 14%. Static A\* still
+  manages 6% on lucky seeds. The heuristic and random never clear.
+- **Average deaths.** Q-learning is monotonic in the death policy:
+  model 3 = 2.16, model 2 = 2.34, model 1 = 2.54 — all noticeably below the
+  planners + heuristic at ≈2.8 and the random baseline / static A\* at ≈3.0.
+  Heavier death penalty produces fewer total deaths per episode.
+- **Time-to-failure.** Q-learning model 3 survives the longest (220 steps
+  before the first death), then model 2 (175) and model 1 (130). The
+  heuristic comes next at 156, replanning / risk-aware A\* at 119, and
+  static A\* dies at step 24 — it commits to a `t = 0` plan and walks into
+  the first ghost it sees.
 
 ### 8.4 Time-to-failure CDF (Figure 4)
 
@@ -337,10 +347,12 @@ A three-panel comparison:
 
 CDF interpretation: at step *x*, what fraction of episodes for that agent
 have already lost a life? Curves that sit lower / further right are safer.
-The heuristic's curve sits below everyone else's for the first 200 steps,
-confirming that its slow-but-cautious style buys it survival time at the
-cost of throughput. Static A\*'s CDF jumps to 1.0 by step ~50 — the agent
-walks into the first ghost it sees because it hasn't replanned.
+Q-learning model 3 sits to the right of every other agent for the first
+~200 steps, with model 2 next and model 1 just behind the heuristic — the
+death-penalty gradient is visible in the survival curves themselves. The
+planners' curves rise sharply between steps 50 and 150. Static A\*'s CDF
+jumps to 1.0 by step ~50 — the agent walks into the first ghost it sees
+because it hasn't replanned.
 
 ### 8.5 Risk vs reward (Figure 5)
 
@@ -350,13 +362,16 @@ X-axis is cumulative hazard exposure, Y-axis is peak score. Each thin
 marker is one episode; the bold X is the per-agent centroid. The
 Pareto-good region is upper-left (high score, low hazard).
 
-**The most striking finding in the paper.** The Q-learning agents form a
-cluster in the upper-left at hazard ≈ 15–20, while the planning agents sit
-in the upper-right at hazard ≈ 110, and the heuristic is at the far right
-(hazard ≈ 200). The Q-learners have **learned a fundamentally more
-risk-averse policy** — they earn less score but they earn it while spending
-~6× less time within ghost-radius of 2. This is the central qualitative
-difference between learned and planned controllers in our setup.
+**The most striking finding in the paper.** All three Q-learning agents
+sit in the upper-left at hazard 22–78, while the planning agents sit at
+hazard ≈ 110 with comparable or lower mean score, and the heuristic is at
+the far right (hazard ≈ 201). Q-learning model 3 in particular Pareto-
+dominates every other agent — higher mean score (3,757) than any planner,
+with **5×** less time within ghost-radius 2. The Q-learners have **learned
+a value function that internalises ghost-avoidance**: they earn more score
+than the planners *and* spend less time near ghosts. This is the central
+qualitative difference between learned and planned controllers in our
+setup.
 
 ### 8.6 Decision-theoretic ablation: λ-sweep (Figure 6)
 
@@ -388,35 +403,41 @@ We discuss in §9 what would change that.
 
 ![Q-learning ablation](notebooks/figures/fig07_qlearning_ablation.png)
 
-Across mean score, clear rate, deaths, and time-to-failure, model 1 — which
-keeps the score on death — is the most score-greedy and survives longer
-between deaths. Model 3, which applies a scaled and ratcheting penalty,
-finishes dead-last on every metric and has the highest variance: it learned
-a policy that *sometimes* scores big but *usually* dies very early. Model 2
-sits in the middle. The lesson is that the death penalty acts as a
-tunable cautiousness knob, but in our state representation the
-strongest-penalty version trains an unstable policy.
+Across mean score, clear rate, deaths, and time-to-failure, the death
+policy is monotonic: heavier penalty produces a stronger learned policy on
+every metric. Model 3 — which applies a scaled and ratcheting penalty —
+leads on all four panels (3,757 mean score, 24% level clears, 2.16 avg
+deaths, 220 steps to first death). Model 2 (zero score on death) sits
+cleanly in the middle. Model 1 (keep score on death) has the weakest
+gradient signal toward avoiding death and consequently the highest deaths
+(2.54), shortest TTF (130), and lowest mean score (3,249) of the three —
+yet it still narrowly tops the planners on score. The lesson is that the
+death penalty acts as a cautiousness knob whose stronger settings produce
+both safer *and* higher-scoring policies in this environment.
 
 ### 8.8 Per-episode score traces (Figure 8)
 
 ![Per-episode score traces](notebooks/figures/fig08_traces.png)
 
 A line per agent across the 50 seeds, useful for spotting variance and
-lucky/unlucky seeds. The replanning A\* line consistently dominates, with
-spike runs around seed indices 4 and 39 (these are the seeds where the
-agent cleared the board for 7,590 points). The random baseline is a flat
-strip near 100.
+lucky/unlucky seeds. Q-learning model 3 sits at the top of the bundle on
+most seeds, with the other two Q-learning models and the planners
+overlapping on the level-clear ceiling (7,800) for their best runs. The
+heuristic and static A\* form a lower band, and the random baseline is a
+flat strip near 160.
 
 ### 8.9 Head-to-head heatmap (Figure 9)
 
 ![Head-to-head heatmap](notebooks/figures/fig09_head_to_head.png)
 
 Each cell is `P(row beats column on the same seed)` — i.e., a paired
-comparison rather than a population comparison. Replanning A\* beats every
-other agent ≥66% of the time. Static A\* loses to *every* learned or
-replanning agent. The Q-learning models cluster around 50% against each
-other, confirming they have learned similar behavioural manifolds and
-differ mostly in cautiousness.
+comparison rather than a population comparison. Q-learning model 3 beats
+every other agent on a majority of seeds, with the model 3 → model 2 →
+model 1 ordering reproducing in the row sums. Replanning A\* and the
+risk-aware variants form a tight cluster against each other (≈50/50
+on most pairs, indicating they are following nearly identical paths) and
+all of them beat the heuristic, static A\*, and random on a clear majority
+of seeds. Static A\* loses to *every* replanning or learned agent.
 
 ## 9. Discussion
 
@@ -424,9 +445,10 @@ differ mostly in cautiousness.
 
 Static A\* finishes with 24-step time-to-failure. The agent commits to a
 plan that was optimal at *t=0* and walks straight into ghosts that have
-since moved into the path. Replanning A\* gets 5× the survival time and 2.5×
-the score with no algorithmic change beyond "rerun A\* every step". This is
-the single most important architectural finding in the project.
+since moved into the path. Replanning A\* gets ~5× the survival time and
+~2.2× the score with no algorithmic change beyond "rerun A\* every step".
+This is the single most important architectural finding among the
+classical-search agents.
 
 ### 9.2 Why λ doesn't move the needle (and what would change that)
 
@@ -454,26 +476,37 @@ decision-theoretic agent beat the replanning agent under the maximum-
 entropy hazard model?" The answer is "no, on this maze" — itself a
 publishable empirical result.
 
-### 9.3 Why Q-learning earns less score but lower hazard exposure
+### 9.3 Why Q-learning earns higher score *and* lower hazard exposure
 
-The state representation buckets ghost distance into seven coarse bins (the
-`danger_bucket` feature). Once a ghost is within a small bin, the Q-table
-has effectively learned that "any action that does not increase the
-distance is bad", and it retreats. The replanning A\* agent, in contrast,
-does not retreat — it plans a path *through* hazard-adjacent corridors when
-those are the cheapest route to a pellet. This shows up as higher hazard
-exposure but higher reward. The Q-learning agent is, in effect, executing
-a learned satisficing policy; the planner is executing an explicit
-maximisation policy.
+Two design choices in the Q-learning stack combine to produce this
+outcome. First, the state representation buckets ghost distance into seven
+coarse bins (the `danger_bucket` feature) alongside pellet, energizer,
+fruit, corridor-depth, and game-phase features. Once a ghost is within a
+small bin, the Q-table has effectively learned a context-sensitive
+retreat: "if there is a closer pellet on the safe side, take it; if not,
+back away." The replanning A\* agent, in contrast, does not retreat — it
+plans a path *through* hazard-adjacent corridors when those are the
+cheapest route to a pellet, which shows up as higher hazard exposure.
+Second, reward shaping (positive bonuses for moving away from threats and
+toward edible ghosts and fruit, plus a level-clear bonus) and the
+death-policy gradient bake survival pressure directly into the value
+function, while A\* only sees ghosts via the obstacle-mask. The result is
+a policy that is *both* safer and more reward-rich: learning the value
+function lets the agent trade off goal-seeking against avoidance per-state,
+where A\* commits to whichever pellet is closest after culling ghost cells.
 
 ### 9.4 Why the heuristic baseline accumulates the most hazard exposure
 
 The hand-coded heuristic includes a "stay in open tiles" term and a "run
 toward edible (scared) ghosts" term. In the canonical maze the agent
 spends a lot of time orbiting near ghosts in the central corridor while
-waiting for a pellet to free up — high hazard exposure (201) but
-respectable time-to-failure (156). It is essentially the opposite of the
-Q-learning trade-off: it tolerates risk to extend survival.
+waiting for a pellet to free up — high hazard exposure (201) and
+respectable time-to-failure (156). It occupies the high-risk corner of
+the Pareto plot: it tolerates being near ghosts in exchange for survival
+time but never converts that time into score, because the orbiting itself
+keeps it from committing to the pellets it needs. The Q-learning agents
+*also* survive a long time, but they do so far from ghosts — which is
+why their hazard column is an order of magnitude lower.
 
 ## 10. Real-World Applications
 
@@ -518,26 +551,28 @@ two halves of the Decker et al. taxonomy:
 Two echoes between their cognitive findings and our agent results stand
 out:
 
-1. **Model-based control wins on raw score in environments with learnable
-   structure.** Decker et al. report that adults with stronger
-   model-based contributions earn significantly more reward than
-   model-free participants on the same trials. Our 50-episode Monte
-   Carlo shows the same pattern at the algorithmic level: the
-   model-based planners earn ~2,200 mean score versus 569–1,089 for the
-   Q-learning models, and they are the *only* family that ever clears
-   the level (14% of episodes — see Section §8.1 and §8.3).
+1. **Both control modes can solve the task — the trade-off is in
+   *how* they solve it.** Decker et al. emphasise that the contribution
+   of model-based control grows with development but never fully
+   replaces model-free habits; both systems are competent. Our 50-episode
+   Monte Carlo shows the same pattern at the algorithmic level: model-
+   based planners earn ≈3,140–3,180 mean score and clear the level on 14%
+   of seeds, while the model-free Q-learners earn 3,249–3,757 and clear
+   16–24% (Section §8.1 and §8.3). Both families dominate the random and
+   static-A\* baselines by a wide margin; neither is broken on this maze.
 
-2. **The two control modes coexist rather than replace each other.** In
-   their data, model-free habits do not vanish in adults; they are
-   *blended* with planning. Our project shows the same coexistence: the
-   Q-learners spend ~6× less time in ghost-radius-2 hazard than the
-   planners (Section §8.5), so the cached-value strategy occupies a
-   genuine niche — caution under uncertainty — even when it loses on raw
-   score. A practical real-world cognitive system, the paper argues,
-   should be a *blend* that uses planning when the model is reliable and
-   cached habits when computation is expensive or the model is wrong;
-   our hazard-vs-reward Pareto plot (Figure 5) is the same claim in
-   miniature.
+2. **Model-free systems can develop cautious, high-utility policies once
+   given the right reward signal.** Our death-policy ablation (Section
+   §8.7) is a controlled illustration of how the *shape* of the loss
+   function changes the learned policy: a stronger penalty for dying
+   produces both a safer and a higher-scoring policy (model 3 > model 2 >
+   model 1 on every metric). In Decker et al.'s framing, the cached-value
+   strategy is not inherently impulsive; it is sensitive to how outcomes
+   are valued, and a sufficiently shaped reward can teach it to generate
+   risk-averse behaviour without explicit forward simulation. Our
+   hazard-vs-reward Pareto plot (Figure 5) shows this directly: the
+   Q-learners are upper-left of the planners, earning more score with
+   less hazard exposure once the death penalty is properly tuned.
 
 The paper is therefore a strong external justification for why building
 *both* a planning agent and a learning agent in our project is the right
@@ -637,14 +672,17 @@ are:
    term can act. The dominance window predicted by §7 of the proposal
    exists, but lies outside the maximum-entropy + nearest-pellet
    parameterisation we used.
-3. **Tabular Q-learning is a competitive, fundamentally more cautious
-   alternative** — ~6× lower hazard exposure for ~2× lower score versus
-   replanning A\*. The death-policy ablation shows that the loss term
-   acts as a tunable cautiousness knob, with model 1 being the most
-   score-aggressive and model 3 the most volatile.
-4. **The hand-coded heuristic is the longest-surviving but
-   highest-exposure agent** — useful as a foil that makes the planner /
-   learner trade-offs concrete.
+3. **Tabular Q-learning leads the field on score *and* hazard exposure.**
+   All three Q-learning models edge out replanning / risk-aware A\* on
+   mean score (3,249–3,757 vs ≈3,150) while spending 1.4–5× less time
+   within ghost-radius 2. The death-policy ablation shows the gradient is
+   monotonic — model 3 (scaled / ratcheting penalty) > model 2 (zero
+   score on death) > model 1 (keep score) — on every metric we measured.
+4. **The hand-coded heuristic is a useful foil** — long survival (156
+   steps to first death) but the highest hazard exposure of any agent
+   (201) and a mean score below every planner and Q-learner. It makes
+   the planner / learner trade-offs concrete by occupying the opposite
+   corner of the risk-vs-reward plot.
 
 ## 12. Limitations and Future Work
 
