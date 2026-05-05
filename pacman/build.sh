@@ -44,7 +44,7 @@ do
     if [ ! -f "$model_file" ]; then
         continue
     fi
-    model_name=$(basename "$model_file" .generated.js | tr '[:lower:]' '[:upper:]')
+    model_name=$(basename "$model_file" .generated.js | sed 's/^rl_//' | tr '[:lower:]' '[:upper:]')
     echo "//@line 1 \"$model_file\"" >> $OUTPUT
     sed "s/window.__PACMAN_RL_MODEL__ = /window.__PACMAN_MODEL_LIBRARY__['$model_name'] = /" "$model_file" >> $OUTPUT
 done

@@ -1,0 +1,6 @@
+usage: rl_q_learning.py [-h] [--episodes EPISODES] [--alpha ALPHA]
+                        [--gamma GAMMA] [--epsilon EPSILON] [--seed SEED]
+                        [--level LEVEL] [--eval-episodes EVAL_EPISODES]
+                        [--death-policy {model1,model2,model3}]
+                        [--output OUTPUT] [--js-output JS_OUTPUT]
+rl_q_learning.py: error: argument --js-output: expected one argument
